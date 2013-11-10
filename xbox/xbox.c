@@ -8,16 +8,33 @@
 #include <linux/input.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
+#include "xbox.h"
 
 #define INPUT_PATH "/dev/input"
 #define EVENT_DEV  "event"
 #define XBOX_NAME "Xbox"
+#define MAX_PLAYERS 4
+
+#define INPUT(a, r) { \
+    if((r = a) == -1) { \
+        if(errno != EAGAIN) { \
+            fprintf(stderr, "Error: call to `%s` on line %d failed with error %s (%d).\n", #a, __LINE__, strerror(errno), errno); \
+            return retval; \
+        } \
+    } \
+}
+
+int current_player;
+int num_players;
+int num_controllers;
+int player_fds[MAX_PLAYERS];
 
 static int is_event(const struct dirent *dir) {
     return strncmp(EVENT_DEV, dir->d_name, 5) == 0;
 }
 
-char** find_controllers() {
+int open_controllers(int debug) {
     // Variables for input identification
     int i = 0;
     int num_devices = 0;
@@ -26,10 +43,12 @@ char** find_controllers() {
     int fd = -1;
     char name[256] = "???";
 
-    // Variables for return value
-    int num_controllers = 0;
-    char **controllers = NULL;
-    char **tmp_controllers = NULL;
+    // Close any existing controller fds and reset the player count
+    for(i = 0; i < MAX_PLAYERS; i++) {
+        close(player_fds[i]);
+    }
+    num_players = 0;
+    num_controllers = 0;
 
     // Find all "event" devices
     num_devices = scandir(INPUT_PATH, &names, is_event, alphasort);
@@ -47,54 +66,46 @@ char** find_controllers() {
         // Get the device name
         ioctl(fd, EVIOCGNAME(sizeof(name)), name);
 
+        if(debug) {
+            printf("DEBUG: Input found: `%s`\n", name);
+        }
         // Is it an Xbox controller?
         if(strstr(name, XBOX_NAME)) {
             // Found a controller
+            player_fds[num_controllers] = fd;
             num_controllers++;
-
-            // Is it the first we've found?
-            if (controllers == NULL) {
-                // Allocate a new return array
-                controllers = (char**)malloc(sizeof(char*));
-            } else {
-                // Increase the size of the return array
-                tmp_controllers = (char**)realloc(controllers, sizeof(char*) * num_controllers);
-                if(tmp_controllers == NULL) {
-                    fprintf(stderr, "Failed to reallocate memory.\n");
-                    return NULL;
-                }
-                // Only update the return array if the realloc was successful
-                controllers = tmp_controllers;
-            }
-
-            // Copy the event filename into the return array
-            controllers[num_controllers - 1] = (char*)malloc(sizeof(char) * 256);
-            strncpy(controllers[num_controllers - 1], fname, 256);
+        } else {
+            // Close the file only if it isn't a controller
+            close(fd);
         }
-
-        // Close the file and free the directory entry
-        close(fd);
+        // Free the directory entry
         free(names[i]);
     }
 
-    // Add a final NULL value to the return array to signal the end
-    tmp_controllers = realloc(controllers, sizeof(char*) * (num_controllers + 1));
-    if(tmp_controllers == NULL) {
-        fprintf(stderr, "Failed to reallocate memory.\n");
-        return NULL;
-    }
-    controllers = tmp_controllers;
-
-    controllers[num_controllers] = NULL;
-    return controllers;
+    return num_controllers;
 }
 
-int main() {
-    char **xbox_inputs = find_controllers();
-    while(*xbox_inputs) {
-        printf("%s\n", *xbox_inputs);
-        free(*xbox_inputs);
-        xbox_inputs++;
+struct player_event get_event() {
+    struct input_event inp;
+    struct player_event retval;
+
+    retval.player = -1;
+    retval.event = -1;
+    retval.data = -1;
+
+    int read_ret;
+    int end_player = (current_player + MAX_PLAYERS - 1) % MAX_PLAYERS;
+
+    for(; current_player != end_player; current_player = (current_player + 1) % MAX_PLAYERS) {
+        INPUT(read(player_fds[current_player], &inp, sizeof(inp)), read_ret);
+        if(read_ret == sizeof(inp)) {
+            // Got some input
+            retval.player = current_player;
+            retval.event = inp.code;
+            retval.data = inp.value;
+            current_player = (current_player + 1) % MAX_PLAYERS;
+            return retval;
+        }
     }
-    return 0;
+    return retval;
 }
