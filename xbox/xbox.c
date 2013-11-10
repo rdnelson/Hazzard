@@ -91,7 +91,7 @@ char** find_controllers() {
 
 int main() {
     char **xbox_inputs = find_controllers();
-    while(xbox_inputs) {
+    while(*xbox_inputs) {
         printf("%s\n", *xbox_inputs);
         free(*xbox_inputs);
         xbox_inputs++;
