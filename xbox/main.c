@@ -10,5 +10,15 @@ int main() {
         return 1;
     }
     printf("Found %d controllers.\n", xbox_inputs);
+
+    struct player_event e;
+    while(1) {
+        e = get_event();
+        if(e.player != -1)
+            printf("Player: %d Event: %d, Value: %d\n", e.player, e.event, e.data);
+        if(e.event == BUTTON_B && e.data == 1) {
+            break;
+        }
+    }
     return 0;
 }
