@@ -57,7 +57,7 @@ int open_controllers(int debug) {
         snprintf(fname, sizeof(fname), "%s/%s", INPUT_PATH, names[i]->d_name);
 
         // Open the event file
-        fd = open(fname, O_RDONLY);
+        fd = open(fname, O_RDWR | O_NONBLOCK);
         if (fd < 0) {
             // Open failed, keep trying the others
             continue;
