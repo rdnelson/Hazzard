@@ -4,30 +4,17 @@ import struct
 import sys
 import thread
 
-class SongData:
-	songName = ''
-	volume = 0
-	class Time:
-		frame = 0
-		percent = 0
-		second = 0
-	
-	time = Time()
-	def __str__(self):
-		songDataStr =  ('Song Data: ' +
-				'\n	songName = ' + self.songName +
-				'\n	volume 	 = ' + str(self.volume) +
-				'\n	Time data:' +
-				'\n		frame 	= ' + str(self.time.frame) +
-				'\n		percent = ' + str(self.time.percent) +
-				'\n		second 	= ' + str(self.time.second))
-		return songDataStr
+class Data:
+	def __init__(self, **kwds):
+		self.__dict__.update(kwds)
+	def __repr__(self):
+		return str(vars(self))
 		
 debug = False
 
 commandCallbacks = dict()
 
-songData = SongData()
+data = Data()
 
 MCAST_IP = '224.0.0.1'
 LOCAL_IP = socket.gethostbyname(socket.gethostname())
@@ -107,49 +94,38 @@ def clearCommandCallbacks():
 	
 def getData(whatData):
 	if debug: print 'Getting ' + whatData + ' data'
-	if whatData == 'song':
-		return songData
+	return getattr(data, whatData)
 	
-def sendCommand(command):
+def sendCommand(command, **kwargs):
 	if debug: print 'Sending command ' + command
 	root = ET.Element('commands')
-	ET.SubElement(root, 'command').text = command
+	commandElem = ET.SubElement(root, 'command')
+	commandElem.text = command
+	for key, value in kwargs.iteritems():
+		commandElem.set(key, value)
 	sock_send.sendto(ET.tostring(root), MCAST_GROUP)
 	if debug: print 'Command sent'
 	
-def sendSongData(data):
-	if debug: print 'Sending song data: ' + data.__str__()
+def sendData(data, name):
+	if debug: print 'Sending data: ' + name
 	root = ET.Element('data')
-	songData = ET.SubElement(root, 'songData')
-	ET.SubElement(songData, 'songName').text = data.songName
-	ET.SubElement(songData, 'volume').text = str(data.volume)
-	time = ET.SubElement(songData, 'time')
-	ET.SubElement(time, 'frame').text = str(data.Time.frame)
-	ET.SubElement(time, 'percent').text = str(data.Time.percent)
-	ET.SubElement(time, 'second').text = str(data.Time.second)
+	dataNode = ET.SubElement(root, name)
+	addNodes(dataNode, vars(data))
 	sock_send.sendto(ET.tostring(root), MCAST_GROUP)
 	if debug: print 'Data sent: ' + ET.tostring(root)
 
 def parse(text):
 	if debug: print 'Parsing'
-	global songData
+	global data
 	root = ET.XML(text)
 	if root.tag == 'data':
 		if debug: print 'Parsing data'
 		for node in list(root):
 			if debug: print 'Parsing data type: ' + node.tag
-			if node.tag == 'songData':
-				songData = SongData()
-				songData.songName 		= root.find('./songData/songName').text
-				if songData.songName is None: songData.songName = ''
-				songData.volume 		= int(root.find('./songData/volume').text)
-				songData.Time.frame 	= int(root.find('./songData/time/frame').text)
-				songData.Time.percent 	= int(root.find('./songData/time/percent').text)
-				songData.Time.second 	= int(root.find('./songData/time/second').text)
-				if debug: 
-					print 'Finished parsing songData'
-					print songData
-			### Add any more processing here
+			nodeClass = Data()
+			for dataNode in list(node):
+				addItem(nodeClass, dataNode)
+			setattr(data, node.tag, nodeClass)
 	
 	elif root.tag == 'commands':
 		if debug: print 'Parsing commands'
@@ -159,5 +135,31 @@ def parse(text):
 			command = commandElem.text
 			if commandCallbacks.has_key(command):
 				if debug: print 'Calling callback for command: ' + commandElem.text
-				commandCallbacks.get(command)()
+				print commandElem.items()
+				commandCallbacks.get(command)(**dict(commandElem.items()))
 			elif debug: print 'Command not found'
+
+def addItem(root, node):
+	if list(node) == []:
+		if node.get('Type') == 'Integer':
+			setattr(root, node.tag, int(node.text))
+		else:
+			setattr(root, node.tag, node.text)
+	else:
+		newItem = Data()
+		for subItem in list(node):
+			addItem(newItem, subItem)
+		setattr(root, node.tag, newItem)
+	
+def addNodes(root, items):
+	for name, value in items.iteritems():
+		newNode = ET.SubElement(root, name)
+		if type(value) == dict:
+			print value
+			addNodes(newNode, value)
+		elif isinstance(value, Data):
+			addNodes(newNode, vars(value))
+		else:
+			if type(value) == int:
+				newNode.set('Type', 'Integer')
+			newNode.text = str(value)

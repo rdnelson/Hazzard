@@ -2,25 +2,15 @@ import PiNet
 
 PiNet.debug = True
 
-PiNet.init(sndPort=9001, rcvPort=9002)
+PiNet.init(sndPort=9001, rcvPort=9001)
 
-songData = PiNet.SongData()
+def CallbackFoo(name, age):
+	print 'His name was ' + name + ', he was only ' + age + ' years old...'
 
-def callMeMaybe():
-	print 'This is crazy!'
-	print songData.songName
-	print songData.volume
-	print songData.Time.frame
-	print songData.Time.percent
-	print songData.Time.second
-PiNet.addCommandCallback('Crazy', callMeMaybe)
+PiNet.addCommandCallback('Test', CallbackFoo)
 
-songData.songName = 'Testing!'
-songData.volume = 47
-songData.Time.frame = 2324
-songData.Time.percent = 84
-songData.Time.second = 126
+PiNet.sendCommand('Test', name='Darren', age="20")
 
-PiNet.sendSongData(songData)
+songData = PiNet.Data(songName = 'Testing', volume = 10, time = PiNet.Data(seconds = 5))
 
-PiNet.sendCommand('Crazy')
+PiNet.sendData(songData, 'songData')

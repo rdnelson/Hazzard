@@ -2,17 +2,8 @@ import PiNet
 
 PiNet.init()
 
-songData = PiNet.SongData()
+data = '<data><songData><songName>Testing!</songName><volume Type="Integer">47</volume><time><frame>2324</frame><percent>84</percent><second>126</second></time></songData></data>'
 
-def callMeMaybe():
-	print 'This is crazy!'
-	print songData.songName
-	print songData.volume
-	print songData.Time.frame
-	print songData.Time.percent
-	print songData.Time.second
-PiNet.addCommandCallback('Crazy', callMeMaybe)
-
-print "Ready for data"
-while True:
-	pass
+PiNet.parse(data)
+songData = PiNet.data.songData
+print PiNet.data
