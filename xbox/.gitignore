@@ -1,2 +1,4 @@
 *.o
-xbox_app
+*.lo
+xbox_test
+xbox.so
