@@ -95,7 +95,7 @@ struct player_event get_event() {
 
     for(; current_player != end_player; current_player = (current_player + 1) % MAX_PLAYERS) {
         INPUT(read(player_fds[current_player], &inp, sizeof(inp)), read_ret);
-        if(read_ret == sizeof(inp)) {
+        if(read_ret == sizeof(inp) && inp.type != 0) {
             // Got some input
             retval.player = current_player;
             retval.event = inp.code;
