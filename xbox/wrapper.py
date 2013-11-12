@@ -1,7 +1,18 @@
-#!/bin/env python
+#!/usr/bin/env python
 from ctypes import cdll, Structure, c_int
 import os
+import sys
 from math import copysign
+
+# Get the script's directory
+local_dir = os.path.dirname(os.path.realpath(__file__))
+
+sys.path.append("%s/../PiNet" % local_dir)
+import PiNet
+
+# Initialize PiNet
+PiNet.init(sndPort=9001)
+
 
 #constants
 STICK_DEADZONE = 15000
@@ -10,6 +21,7 @@ THROTTLE = [2, 5]
 BUTTONS = [304,305,307,308,310,311,314,315,316,317,318,704,705,706,707]
 MAX_PLAYERS = 4
 STICK_MAX = 32767
+DEBUG = 0
 
 # Define the event class for the xbox library
 class PlayerEvent(Structure):
@@ -39,8 +51,6 @@ sticks_dead = {}
 for stick in STICKS:
     sticks_dead[stick] = 1
 
-# Get the script's directory
-local_dir = os.path.dirname(os.path.realpath(__file__))
 
 # Load the library, and bail if the loading fails
 xbox_lib = cdll.LoadLibrary("%s/xbox.so" % local_dir)
@@ -57,4 +67,6 @@ while True:
     get_event.restype = PlayerEvent
     e = xbox_lib.get_event()
     if (valid_event(e)):
-        print e.player, ",", e.event, ",", e.data
+        PiNet.sendCommand("ControllerEvent", player=str(e.player), event=str(e.event), data=str(e.data))
+        if (DEBUG):
+            print e.player, ",", e.event, ",", e.data
