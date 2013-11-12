@@ -34,7 +34,7 @@ static int is_event(const struct dirent *dir) {
     return strncmp(EVENT_DEV, dir->d_name, 5) == 0;
 }
 
-int open_controllers(int debug) {
+int open_controllers() {
     // Variables for input identification
     int i = 0;
     int num_devices = 0;
@@ -66,9 +66,6 @@ int open_controllers(int debug) {
         // Get the device name
         ioctl(fd, EVIOCGNAME(sizeof(name)), name);
 
-        if(debug) {
-            printf("DEBUG: Input found: `%s`\n", name);
-        }
         // Is it an Xbox controller?
         if(strstr(name, XBOX_NAME)) {
             // Found a controller

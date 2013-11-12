@@ -4,7 +4,7 @@
 #include "xbox.h"
 
 int main() {
-    int xbox_inputs = open_controllers(0);
+    int xbox_inputs = open_controllers();
     if(xbox_inputs == 0) {
         printf("Error: No XBox controllers found. Try running as root.");
         return 1;

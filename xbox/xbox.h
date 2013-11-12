@@ -1,7 +1,7 @@
 #ifndef __XBOX_H__
 #define __XBOX_H__
 
-int open_controllers(int debug);
+int open_controllers();
 struct player_event get_event();
 
 struct player_event {
