@@ -39,10 +39,9 @@ class Sender:
 		if port is None: port = self.defaultPort
 		if self.debug: print 'Sending asyncData ' + tag + ' to ', port
 		root = ET.Element('asyncData')
-		packetElem = ET.SubElement(root, 'packet')
-		packetElem.text = tag
+		node = ET.SubElement(root, tag)
 		for key, value in kwargs.iteritems():
-			packetElem.set(key, value)
+			node.set(key, value)
 		self.sock_send.sendto(ET.tostring(root), (MCAST_IP, port))
 		if self.debug: print 'AsyncData sent'
 		
@@ -69,8 +68,8 @@ class Sender:
 				newNode.text = str(value)
 		
 class Receiver:
-	commandCallbacks = dict()
-	data = Data()
+	callbacks = dict()
+	__data = Data()
 	sock_receive = socket.socket()
 
 	SERVER_ADDRESS = ()
@@ -118,20 +117,20 @@ class Receiver:
 				pass
 
 	def addCallback(self, tag, callbackFunction):
-		self.commandCallbacks.update({tag:callbackFunction})
+		self.callbacks.update({tag:callbackFunction})
 		if self.debug: print 'Added callback: ' + tag
 		
 	def removeCallback(self, tag):
 		if self.debug: 'Removing callback: ' + tag
-		return self.commandCallbacks.pop(tag,False)
+		return self.callbacks.pop(tag,False)
 		
 	def clearCallbacks(self):
-		self.commandCallbacks.clear()
+		self.callbacks.clear()
 		if self.debug: 'Clearing callbacks'
 		
 	def getData(self, whatData):
 		if self.debug: print 'Getting ' + whatData + ' syncData'
-		return getattr(self.data, whatData)
+		return getattr(self.__data, whatData)
 
 	def parse(self, text):
 		if self.debug: print 'Parsing'
@@ -143,19 +142,18 @@ class Receiver:
 				nodeClass = Data()
 				for dataNode in list(node):
 					self.__addItem(nodeClass, dataNode)
-				setattr(self.data, node.tag, nodeClass)
+				setattr(self.__data, node.tag, nodeClass)
 		
 		elif root.tag == 'asyncData':
 			if self.debug: print 'Parsing asyncData'
-			packets = root.findall('./packet')
-			for packetElem in packets:
-				if self.debug: print 'Parsing asyncData: ' + packetElem.text
-				tag = packetElem.text
-				if self.commandCallbacks.has_key(tag):
-					if self.debug: print 'Calling callback for packet: ' + packetElem.text
-					if self.debug: print packetElem.items()
-					self.commandCallbacks.get(tag)(**dict(packetElem.items()))
-				elif self.debug: print 'Callback not found for ' + packetElem.text
+			for node in list(root):
+				tag = node.tag
+				if self.debug: print 'Parsing asyncData: ' + tag
+				if self.callbacks.has_key(tag):
+					if self.debug: print 'Calling callback for packet: ' + node.tag
+					if self.debug: print node.items()
+					self.callbacks.get(tag)(**dict(node.items()))
+				elif self.debug: print 'Callback not found for ' + node.tag
 
 	def __addItem(self, root, node):
 		if list(node) == []:
