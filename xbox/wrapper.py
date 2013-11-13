@@ -11,7 +11,7 @@ sys.path.append("%s/../PiNet" % local_dir)
 import PiNet
 
 # Initialize PiNet
-PiNet.init(sndPort=9001)
+sender = PiNet.Sender()
 
 
 #constants
@@ -67,6 +67,6 @@ while True:
     get_event.restype = PlayerEvent
     e = xbox_lib.get_event()
     if (valid_event(e)):
-        PiNet.sendCommand("ControllerEvent", player=str(e.player), event=str(e.event), data=str(e.data))
+        sender.sendAsync("ControllerEvent", player=str(e.player), event=str(e.event), data=str(e.data))
         if (DEBUG):
             print e.player, ",", e.event, ",", e.data
