@@ -1,7 +1,5 @@
 import xml.etree.ElementTree as ET 
 import socket
-import struct
-import sys
 import thread
 
 class Data:
@@ -10,156 +8,161 @@ class Data:
 	def __repr__(self):
 		return str(vars(self))
 		
-debug = False
-
-commandCallbacks = dict()
-
-data = Data()
-
-MCAST_IP = '224.0.0.1'
 LOCAL_IP = socket.gethostbyname(socket.gethostname())
+MCAST_IP = '224.0.0.1'
 
-SERVER_ADDRESS = ()
-MCAST_GROUP_SEND = ()
+class Sender:
+	sock_send = socket.socket()
+	defaultPort = 0
+	
+	debug = False
+	
+	def __init__(self, port=9001):
+		self.defaultPort = port
+	
+		if self.debug: print 'Creating socket for sending'					
 
-sock_receive = socket.socket()
-sock_send = socket.socket()
-	
-def init(rcvPort=9001, sndPort=9001):
-	setPort(rcvPort, sndPort)
-	global sock_receive
-	global sock_send
+		# Create a socket for sending
+		self.sock_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+		self.sock_send.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
+		
+		if self.debug: 
+			print 'Socket created'
+			print 'Init finished'
+			print ''
+		
+	def setDefaultPort(self, port):
+		if self.debug: print 'Setting default port to ', port
+		self.defaultPort = port
+		
+	def sendAsync(self, tag, port=None, **kwargs):
+		if port is None: port = self.defaultPort
+		if self.debug: print 'Sending asyncData ' + tag + ' to ', port
+		root = ET.Element('asyncData')
+		node = ET.SubElement(root, tag)
+		for key, value in kwargs.iteritems():
+			node.set(key, value)
+		self.sock_send.sendto(ET.tostring(root), (MCAST_IP, port))
+		if self.debug: print 'AsyncData sent'
+		
+	def sendUpdate(self, data, name, port=None):
+		if port is None: port = self.defaultPort
+		if self.debug: print 'Sending syncData: ' + name + ' to ', port
+		root = ET.Element('syncData')
+		dataNode = ET.SubElement(root, name)
+		self.__addNodes(dataNode, vars(data))
+		self.sock_send.sendto(ET.tostring(root), (MCAST_IP, port))
+		if self.debug: print 'Data sent: ' + ET.tostring(root)
+		
+	def __addNodes(self, root, items):
+		for name, value in items.iteritems():
+			newNode = ET.SubElement(root, name)
+			if type(value) == dict:
+				print value
+				self.__addNodes(newNode, value)
+			elif isinstance(value, Data):
+				self.__addNodes(newNode, vars(value))
+			else:
+				if type(value) == int:
+					newNode.set('Type', 'Integer')
+				newNode.text = str(value)
+		
+class Receiver:
+	callbacks = dict()
+	__data = Data()
+	sock_receive = socket.socket()
 
-	if debug: print 'Creating socket for receiving'
+	SERVER_ADDRESS = ()
 	
-	# Create the socket for receiving
-	sock_receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-	sock_receive.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	sock_receive.bind(SERVER_ADDRESS)
+	debug = False
 	
-	if debug: print 'Socket created'
+	def __init__(self, port=9001):
+		self.__setPort(port)
+		
+		if self.debug: print 'Creating socket for receiving'
+		
+		# Create the socket for receiving
+		self.sock_receive.settimeout(None)
+		self.sock_receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+		self.sock_receive.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.sock_receive.bind(self.SERVER_ADDRESS)
+		
+		if self.debug: print 'Socket created, bound to ', port
 
-	if debug: print 'Joining multicast group'
-	
-	# Join the multicast group
-	sock_receive.setsockopt(socket.IPPROTO_IP,
-			socket.IP_ADD_MEMBERSHIP,
-                        socket.inet_aton(MCAST_IP) + socket.inet_aton(LOCAL_IP))
+		if self.debug: print 'Joining multicast group'
+		
+		# Join the multicast group
+		self.sock_receive.setsockopt(socket.IPPROTO_IP,
+									 socket.IP_ADD_MEMBERSHIP,
+									 socket.inet_aton(MCAST_IP) + socket.inet_aton(LOCAL_IP))
 
-	if debug: print 'Creating socket for sending'					
+		if self.debug: 
+			print 'Init finished'
+			print ''
 
-	# Create a socket for sending
-	sock_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-	sock_send.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
+		thread.start_new_thread(self.receiver, ())
+		
+	def __setPort(self, port):
+		if self.debug: print 'Setting receive port to ', port
+		self.SERVER_ADDRESS = ('', port)
+		
+		
+	def receiver(self):
+		while True:
+			try:
+				data, address = self.sock_receive.recvfrom(1024)
+				if self.debug: print "Got ", data, " from ", address
+				self.parse(data)
+			except:
+				pass
 
-	if debug: 
-		print 'Socket created'
-		print 'Init finished'
-		print ''
+	def addCallback(self, tag, callbackFunction):
+		self.callbacks.update({tag:callbackFunction})
+		if self.debug: print 'Added callback: ' + tag
+		
+	def removeCallback(self, tag):
+		if self.debug: 'Removing callback: ' + tag
+		return self.callbacks.pop(tag,False)
+		
+	def clearCallbacks(self):
+		self.callbacks.clear()
+		if self.debug: 'Clearing callbacks'
+		
+	def getData(self, whatData):
+		if self.debug: print 'Getting ' + whatData + ' syncData'
+		return getattr(self.__data, whatData)
 
-	thread.start_new_thread(receiver, ())
-	
-def setPort(rcvPort, sndPort):
-	global MCAST_PORT
-	global SERVER_ADDRESS
-	global MCAST_GROUP
-	if debug: print 'Setting receive port to ', rcvPort
-	SERVER_ADDRESS = ('', rcvPort)
-	MCAST_GROUP = (MCAST_IP, sndPort)
-	
-	
-def receiver():
-	while True:
-		try:
-			data, address = sock_receive.recvfrom(1024)
-			if debug: print data
-			parse(data)
-		except:
-			pass
+	def parse(self, text):
+		if self.debug: print 'Parsing'
+		root = ET.XML(text)
+		if root.tag == 'syncData':
+			if self.debug: print 'Parsing syncData'
+			for node in list(root):
+				if self.debug: print 'Parsing syncData type: ' + node.tag
+				nodeClass = Data()
+				for dataNode in list(node):
+					self.__addItem(nodeClass, dataNode)
+				setattr(self.__data, node.tag, nodeClass)
+		
+		elif root.tag == 'asyncData':
+			if self.debug: print 'Parsing asyncData'
+			for node in list(root):
+				tag = node.tag
+				if self.debug: print 'Parsing asyncData: ' + tag
+				if self.callbacks.has_key(tag):
+					if self.debug: print 'Calling callback for packet: ' + node.tag
+					if self.debug: print node.items()
+					self.callbacks.get(tag)(**dict(node.items()))
+				elif self.debug: print 'Callback not found for ' + node.tag
 
-def addCommandCallback(command, callbackFunction):
-	global commandCallbacks
-	commandCallbacks.update({command:callbackFunction})
-	if debug: print 'Added command, ' + command
-	
-def removeCommandCallback(command):
-	global commandCallbacks
-	if debug: 'Removing command: ' + command
-	return commandCallbacks.pop(command,False)
-	
-def clearCommandCallbacks():
-	global commandCallbacks
-	commandCallbacks.clear()
-	if debug: 'Clearing commands'
-	
-def getData(whatData):
-	if debug: print 'Getting ' + whatData + ' data'
-	return getattr(data, whatData)
-	
-def sendCommand(command, **kwargs):
-	if debug: print 'Sending command ' + command
-	root = ET.Element('commands')
-	commandElem = ET.SubElement(root, 'command')
-	commandElem.text = command
-	for key, value in kwargs.iteritems():
-		commandElem.set(key, value)
-	sock_send.sendto(ET.tostring(root), MCAST_GROUP)
-	if debug: print 'Command sent'
-	
-def sendData(data, name):
-	if debug: print 'Sending data: ' + name
-	root = ET.Element('data')
-	dataNode = ET.SubElement(root, name)
-	addNodes(dataNode, vars(data))
-	sock_send.sendto(ET.tostring(root), MCAST_GROUP)
-	if debug: print 'Data sent: ' + ET.tostring(root)
-
-def parse(text):
-	if debug: print 'Parsing'
-	global data
-	root = ET.XML(text)
-	if root.tag == 'data':
-		if debug: print 'Parsing data'
-		for node in list(root):
-			if debug: print 'Parsing data type: ' + node.tag
-			nodeClass = Data()
-			for dataNode in list(node):
-				addItem(nodeClass, dataNode)
-			setattr(data, node.tag, nodeClass)
-	
-	elif root.tag == 'commands':
-		if debug: print 'Parsing commands'
-		commands = root.findall('./command')
-		for commandElem in commands:
-			if debug: print 'Parsing command: ' + commandElem.text
-			command = commandElem.text
-			if commandCallbacks.has_key(command):
-				if debug: print 'Calling callback for command: ' + commandElem.text
-				print commandElem.items()
-				commandCallbacks.get(command)(**dict(commandElem.items()))
-			elif debug: print 'Command not found'
-
-def addItem(root, node):
-	if list(node) == []:
-		if node.get('Type') == 'Integer':
-			setattr(root, node.tag, int(node.text))
+	def __addItem(self, root, node):
+		if list(node) == []:
+			if node.get('Type') == 'Integer':
+				setattr(root, node.tag, int(node.text))
+			else:
+				setattr(root, node.tag, node.text)
 		else:
-			setattr(root, node.tag, node.text)
-	else:
-		newItem = Data()
-		for subItem in list(node):
-			addItem(newItem, subItem)
-		setattr(root, node.tag, newItem)
-	
-def addNodes(root, items):
-	for name, value in items.iteritems():
-		newNode = ET.SubElement(root, name)
-		if type(value) == dict:
-			print value
-			addNodes(newNode, value)
-		elif isinstance(value, Data):
-			addNodes(newNode, vars(value))
-		else:
-			if type(value) == int:
-				newNode.set('Type', 'Integer')
-			newNode.text = str(value)
+			newItem = Data()
+			for subItem in list(node):
+				self.__addItem(newItem, subItem)
+			setattr(root, node.tag, newItem)
