@@ -1,16 +1,20 @@
-import PiNet
+from PiNet import *
 
-PiNet.debug = True
+class SongData(Data):
+	def __init__(self):
+		self.songName = "Blank!"
+		self.volume = 8
+		
+		self.time = Data(seconds = 10, frames = 2364, percent = 27)
 
-PiNet.init(sndPort=9001, rcvPort=9001)
+pn = Sender(9001)
+pn.debug = False
 
-def CallbackFoo(name, age):
-	print 'His name was ' + name + ', he was only ' + age + ' years old...'
+pn.sendAsync('Test', name='Darren', age="20")
 
-PiNet.addCommandCallback('Test', CallbackFoo)
+testDict = {'name':'Darren', 'age':"20"}
+pn.sendAsync('Test2', **testDict)
 
-PiNet.sendCommand('Test', name='Darren', age="20")
-
-songData = PiNet.Data(songName = 'Testing', volume = 10, time = PiNet.Data(seconds = 5))
-
-PiNet.sendData(songData, 'songData')
+songData = SongData()
+songData.randomItemOfData = "something..."
+pn.sendUpdate(songData, 'songData')
