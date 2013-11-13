@@ -1,0 +1,4 @@
+*.o
+*.lo
+xbox_test
+xbox.so

@@ -1,0 +1,5 @@
+# This udev rule sets up the xbox controller, and gives permission to everybody.
+# Author: Robert Nelson
+# Date: Nov 10, 2013
+
+KERNEL=="event*" SUBSYSTEM=="input", ATTRS{idVendor}=="045e", ATTRS{idProduct}=="0719", MODE:="0666", SYMLINK+="xbox/xbox%n"
