@@ -46,6 +46,11 @@ def valid_event(evt):
             return False
     return True
 
+def error_event(evt):
+    if(evt.player == -1 and evt.data != -1):
+        return True
+    return False
+
 # Create stick deadzone status dictionary
 sticks_dead = {}
 for stick in STICKS:
@@ -70,3 +75,5 @@ while True:
         sender.sendAsync("ControllerEvent", player=str(e.player), event=str(e.event), data=str(e.data))
         if (DEBUG):
             print e.player, ",", e.event, ",", e.data
+    elif(err_event(e)):
+        print "Fatal error, quitting."

@@ -20,6 +20,7 @@
     if((r = a) == -1) { \
         if(errno != EAGAIN) { \
             fprintf(stderr, "Error: call to `%s` on line %d failed with error %s (%d).\n", #a, __LINE__, strerror(errno), errno); \
+            retval.data = errno; \
             return retval; \
         } \
     } \
