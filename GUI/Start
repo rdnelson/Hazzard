@@ -44,6 +44,7 @@ public class Start extends javax.swing.JFrame {
         jButton7 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		setResizable(false);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/start.jpg"))); // NOI18N
 
@@ -165,7 +166,7 @@ public class Start extends javax.swing.JFrame {
 				.addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE)
 				.addContainerGap(0, 0))
         );
-
+		
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>                        
@@ -200,18 +201,25 @@ public class Start extends javax.swing.JFrame {
 
     private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {                                      
         // TODO add your handling code here:
+        new GameStats(1).setVisible(true);
+        this.setVisible(false);
     }                                     
 
     private void jButton5MouseClicked(java.awt.event.MouseEvent evt) {                                      
         // TODO add your handling code here:
+        new GameStats(2).setVisible(true);
+        this.setVisible(false);
     }                                     
 
     private void jButton6MouseClicked(java.awt.event.MouseEvent evt) {                                      
         // TODO add your handling code here:
+        new GameStats(3).setVisible(true);
+        this.setVisible(false);
     }                                     
 
     private void jButton7MouseClicked(java.awt.event.MouseEvent evt) {                                      
         // TODO add your handling code here:
+        System.exit(0);
     }                                     
 
 
