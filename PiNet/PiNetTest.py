@@ -2,6 +2,7 @@ import PiNet
 import unittest
 import socket
 import xml.etree.ElementTree
+import time
 
 class TestReceiver(unittest.TestCase):
 	def callback(self, testArg=None, testArg1=None, testArg2=None):
@@ -84,6 +85,26 @@ class TestReceiver(unittest.TestCase):
 		testArg = 1
 		self.receiver.addCallback("test", self.callback)
 		self.assertRaises(xml.etree.ElementTree.ParseError, self.receiver.parse, ("<asyncData><test testArg=" + str(testArg) + "></test></asyncData>"))
-
+	
+	def test_init_simple(self):
+		testObj = PiNet.Receiver()
+		self.assertEquals(testObj.SERVER_ADDRESS, ('', 9001))
+		
+	def test_init_setport(self):
+		testObj = PiNet.Receiver(9002)
+		self.assertEquals(testObj.SERVER_ADDRESS, ('', 9002))
+		
+	def test_receive(self):
+		self.receiver.addCallback("test", self.callback)
+		message = 'MessageReceived'
+		self.sock_send.sendto("<asyncData><test testArg='" + message + "'></test></asyncData>", ('224.0.0.1', 9001))
+		time.sleep(0.5)
+		self.assertEquals(self.testText, 'MessageReceived')
+		
+	def test_getdata(self):
+		self.sock_send.sendto("<syncData><test><testData Type='Integer'>4</testData></test></syncData>", ('224.0.0.1', 9001))
+		time.sleep(0.5)
+		self.assertEquals(self.receiver.getData('test').testData, 4)
+		
 if __name__ == '__main__':
     unittest.main()
