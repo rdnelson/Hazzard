@@ -28,7 +28,11 @@
 #define RX_PW_P5 0x16
 #define FIFO_STATUS 0x17
 #define DYNPD 0x1C
+#define FEATURE 0x1D
+
 /* Bit Mnemonics */
+#define RF_DR_LOW 5
+
 
 /* configuratio nregister */
 #define MASK_RX_DR 6
@@ -38,6 +42,7 @@
 #define CRCO 2
 #define PWR_UP 1
 #define PRIM_RX 0
+
 
 /* enable auto acknowledgment */
 #define ENAA_P5 5
@@ -93,7 +98,7 @@
 #define DPL_P4 4
 #define DPL_P5 5
 
-
+#define EN_DPL 2
 
 /* SPI instructions */
 #define I_R_REGISTER    0x00
@@ -101,13 +106,21 @@
 #define I_REGISTER_MASK 0x1F
 #define I_R_RX_PAYLOAD  0x61
 #define I_W_TX_PAYLOAD  0xA0
+#define I_W_TX_PAYLOAD_NOACK  0xB0
+
 #define I_FLUSH_TX      0xE1
 #define I_FLUSH_RX      0xE2
 #define I_REUSE_TX_PL   0xE3
 #define I_NOP           0xFF
+#define I_R_RX_PL_WID	0x60 
 
 #define NRF_CHANNEL 3
 
+
+typedef enum NRF_MODE{
+	MODE_RX,
+	MODE_TX,
+} nrf_mode_t;
 
 typedef void (*fp_set_csn)(uint8_t);
 typedef void (*fp_set_ce)(uint8_t);
@@ -125,13 +138,13 @@ void nrf_read_register(uint8_t reg, uint8_t* pStart, uint8_t len);
 void nrf_write_register(uint8_t reg, uint8_t* pStart, uint8_t len);
 void nrf_power_up();
 void nrf_power_down();
-
+void nrf_flush_tx();
 
 uint8_t nrf_data_available();
-
+uint8_t nrf_get_payload_size();
 void nrf_set_address(uint8_t tx, uint8_t* pStart);
-void nrf_send(uint8_t* pStart);
-void nrf_power_radio(uint8_t tx);
-void nrf_receive(uint8_t* pStart);
-
+void nrf_send(uint8_t* pStart, uint8_t uSz);
+void nrf_power_radio(nrf_mode_t tx);
+void nrf_receive(uint8_t* pStart, uint8_t len);
+uint8_t nrf_is_busy();
 #endif
