@@ -23,7 +23,7 @@ int main(int argc, char** argv){
 	uint8_t packet_count = argc > 1 ? atoi(argv[1]) : 100;	
 	
 	//initialize nRF library for the Raspberry Pi
-	libnrf_rpi_init();
+	nrf_init();
 
 	//print init message and STATUS
 	printf("Initialized nRF module\n");

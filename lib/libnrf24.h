@@ -122,15 +122,10 @@ typedef enum NRF_MODE{
 	MODE_TX,
 } nrf_mode_t;
 
-typedef void (*fp_set_csn)(uint8_t);
-typedef void (*fp_set_ce)(uint8_t);
+typedef enum {R =0, W=1} io_mode_t;
+typedef enum {LOW =0, HIGH=1} pinmode;
 
-typedef void (*fp_transmit_sync)(uint8_t*, uint8_t*, uint8_t);
-typedef void (*fp_transfer_sync)(uint8_t*, uint8_t);
-typedef uint8_t (*fp_fast_shift)(uint8_t);
-
-void nrf_init(fp_set_ce, fp_set_csn, fp_fast_shift, 
-				fp_transmit_sync, fp_transfer_sync);
+void nrf_init();
 void nrf_config(uint8_t channel, uint8_t payload_sz);
 void nrf_config_register(uint8_t reg, uint8_t value);
 uint8_t nrf_read_status();
@@ -147,4 +142,13 @@ void nrf_send(uint8_t* pStart, uint8_t uSz);
 void nrf_power_radio(nrf_mode_t tx);
 void nrf_receive(uint8_t* pStart, uint8_t len);
 uint8_t nrf_is_busy();
+
+extern void set_ce(pinmode mode);
+extern void set_csn(pinmode mode);
+
+extern void transmit_sync(uint8_t* pStart, uint8_t* pIn, uint8_t len);
+extern void transfer_sync(uint8_t* pStart, uint8_t len);
+extern uint8_t fast_shift(uint8_t value);
+extern void platform_init();
+
 #endif

@@ -2,11 +2,6 @@
 
 #define _BV(c)	(1 << c)
 
-static fp_set_csn set_csn = NULL;
-static fp_set_ce set_ce = NULL;
-static fp_fast_shift fast_shift = NULL;
-static fp_transmit_sync transmit_sync = NULL;
-static fp_transfer_sync transfer_sync = NULL;
 
 uint8_t nrf_is_busy()
 {
@@ -108,14 +103,9 @@ void nrf_send(uint8_t* pStart, uint8_t uSz)
 
 
 
-void nrf_init(fp_set_ce ce_fp, fp_set_csn fp_csn, fp_fast_shift fp_fs,
-              fp_transmit_sync fp_ts, fp_transfer_sync fp_tx)
+void nrf_init()
 {
-    set_ce = ce_fp;
-    set_csn = fp_csn;
-    fast_shift = fp_fs;
-    transmit_sync = fp_ts;
-    transfer_sync = fp_tx;
+    platform_init();
     set_csn(1);
     set_ce(0);
 

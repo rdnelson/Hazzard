@@ -13,7 +13,7 @@ uint8_t spi_buffer_out[33];
 
 
 
-void libnrf_rpi_init(){
+void platform_init(){
 	bcm2835_init();
 
 	bcm2835_gpio_fsel(RPI_GPIO_P1_26,BCM2835_GPIO_FSEL_OUTP); //CE
@@ -28,14 +28,14 @@ void libnrf_rpi_init(){
     nrf_init(set_ce, set_csn, libnrf_spi_fast_shift, libnrf_spi_transmit_sync, libnrf_spi_transfer_sync);
 
 }
-uint8_t libnrf_spi_fast_shift(uint8_t in){
+uint8_t fast_shift(uint8_t in){
 	uint8_t a;
 	a =  bcm2835_spi_transfer(in);
 
 	return a;
 }
 
-void libnrf_spi_transmit_sync(uint8_t* pStart, uint8_t* pOut, uint8_t len){
+void transmit_sync(uint8_t* pStart, uint8_t* pOut, uint8_t len){
 	int i = 0;
 	/*printf("len is %d\n", len);
 	for (i=0;i<32;i++)
@@ -49,7 +49,7 @@ void libnrf_spi_transmit_sync(uint8_t* pStart, uint8_t* pOut, uint8_t len){
 	memcpy(pOut,spi_buffer_in, len);
 
 }
-void libnrf_spi_transfer_sync(uint8_t* pOut, uint8_t len){
+void transfer_sync(uint8_t* pOut, uint8_t len){
 	int i;
 	bcm2835_spi_writenb(pOut, len);
 	/*printf("buffer out is");

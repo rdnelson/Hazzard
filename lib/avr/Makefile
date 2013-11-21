@@ -1,4 +1,4 @@
-PROGRAMS=main main3
+PROGRAMS=main
 SRC=libspi.c uart.c
 TARGETS=$(PROGRAMS:%=%.hex)
 OBJ=$(SRC:.c=.o)
@@ -13,7 +13,7 @@ all: $(TARGETS)
 	avr-objcopy --strip-all -O ihex -R .eeprom $< $@
 
 %.elf: libnrf24.o %.c $(OBJ) 
-	avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p  -I../ -nostartfiles $^  -o $@
+	avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p  -I../ $^  -o $@
 
 
 clean:

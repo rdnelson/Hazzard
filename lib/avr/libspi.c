@@ -25,7 +25,7 @@ void libspi_init(){
 }
 
 //shift a buffer into SPI and get the shifted out contents back
-void libspi_shift_buffer(uint8_t* pIn, uint8_t* pOut, uint8_t len)
+void transmit_sync(uint8_t* pIn, uint8_t* pOut, uint8_t len)
 {
 	uint8_t i;
 	for (i =0 ;i < len; i++){
@@ -37,7 +37,7 @@ void libspi_shift_buffer(uint8_t* pIn, uint8_t* pOut, uint8_t len)
 }
 
 //synchronously transfer out a buffer onto the SPI bux.
-void libspi_tx_buffer(uint8_t* pStart, uint8_t len){
+void transfer_sync(uint8_t* pStart, uint8_t len){
 	uint8_t i;
 	for (i = 0; i < len; i++){
 		SPDR = pStart[i];
@@ -46,7 +46,7 @@ void libspi_tx_buffer(uint8_t* pStart, uint8_t len){
 }
 
 
-uint8_t libspi_tx_blocking(uint8_t b){
+uint8_t fast_shift(uint8_t b){
     SPDR = b;
  	while ((SPSR & _BV(SPIF)) == 0);
     return SPDR;
