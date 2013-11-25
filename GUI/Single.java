@@ -25,6 +25,7 @@ public class Single extends javax.swing.JFrame {
     boolean lReady = false, start = false;     //inital status
     int countDown = 300;
     int minRecord = 99, secRecord = 99, msRecord = 999;
+    double vl = 0;
     
     public Single() {
         initComponents();
