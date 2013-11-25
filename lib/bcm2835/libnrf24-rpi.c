@@ -22,10 +22,7 @@ void platform_init(){
 
     bcm2835_spi_setClockSpeed(BCM2835_SPI_SPEED_8MHZ); 
     bcm2835_spi_begin(BCM2835_SPI_CS_NONE);
-    //wait for startup of SPI
-    delay(5);
-   bcm2835_gpio_fsel(RPI_GPIO_P1_24,BCM2835_GPIO_FSEL_OUTP); //CSN
-    nrf_init(set_ce, set_csn, libnrf_spi_fast_shift, libnrf_spi_transmit_sync, libnrf_spi_transfer_sync);
+   bcm2835_gpio_fsel(RPI_GPIO_P1_24,BCM2835_GPIO_FSEL_OUTP); //CS
 
 }
 uint8_t fast_shift(uint8_t in){
@@ -36,37 +33,24 @@ uint8_t fast_shift(uint8_t in){
 }
 
 void transmit_sync(uint8_t* pStart, uint8_t* pOut, uint8_t len){
-	int i = 0;
-	/*printf("len is %d\n", len);
-	for (i=0;i<32;i++)
-		spi_buffer_in[i]=0;
-	*/	
-	bcm2835_spi_transfernb(pStart, spi_buffer_in, len);
-	/*printf("buffer in is");
-	for (i=0;i<len;i++)
-		printf("%02X", spi_buffer_in[i]);
-	printf(":hex\n");		*/
+	bcm2835_spi_transfernb((char*)pStart, (char*)spi_buffer_in, len);
 	memcpy(pOut,spi_buffer_in, len);
 
 }
 void transfer_sync(uint8_t* pOut, uint8_t len){
-	int i;
-	bcm2835_spi_writenb(pOut, len);
-	/*printf("buffer out is");
-	for (i=0;i<len;i++)
-		printf("%02X", pOut[i]);
-	printf("\n");*/
+	
+	bcm2835_spi_writenb((char*)pOut, len);
 }
-void set_ce(uint8_t val){
-	if (val)
+void set_ce(pinmode val){
+	if (val == HIGH)
 		  bcm2835_gpio_write(CE_PIN, HIGH);
 	else
 		  bcm2835_gpio_write(CE_PIN, LOW);
 
 }
 //does nothing, because the BCM2835 library takes care of SPI 
-void set_csn(uint8_t val){
-	if (val)
+void set_csn(pinmode val){
+	if (val == HIGH)
 		  bcm2835_gpio_write(CSN_PIN, HIGH);
 	else
 		  bcm2835_gpio_write(CSN_PIN, LOW);
