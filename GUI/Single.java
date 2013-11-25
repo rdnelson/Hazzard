@@ -114,7 +114,7 @@ public class Single extends javax.swing.JFrame {
                 
                 if(start){
                     jButton1.setVisible(false);
-                    if(sec==2&&ms==574){lFinish=true;}
+                    if(sec==9&&ms==9){lFinish=true;}
                     if(sec==2&&ms==2){lLeft = true; lStraight = false; lRight = false;}
                     if(sec==4&&ms==4){lLeft = false; lStraight = false; lRight = true;}
                     if(sec==7&&ms==7){lLeft = false; lStraight = true; lRight = false;}
