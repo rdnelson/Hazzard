@@ -1,4 +1,3 @@
-
 //import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.time;
 import static java.awt.Color.*;
 import java.awt.event.ActionEvent;
@@ -151,11 +150,17 @@ public class GameStats extends javax.swing.JFrame {
                 }
                 
                 if(start){
-                    if(sec==2&&ms==574){lFinish=true;}
-                    if(sec==4&&ms==4){rFinish=true;}                
+                    if(sec==9&&ms==9){lFinish=true;}
+                    if(sec==2&&ms==2){lLeft = true; lStraight = false; lRight = false;}
+                    if(sec==4&&ms==4){lLeft = false; lStraight = false; lRight = true;}
+                    if(sec==7&&ms==7){lLeft = false; lStraight = true; lRight = false;}
+                    if(sec==11&&ms==473){rFinish=true;}
+                    if(sec==4&&ms==4){rLeft = true; rStraight = false; rRight = false;}
+                    if(sec==6&&ms==6){rLeft = false; rStraight = false; rRight = true;}
+                    if(sec==9&&ms==9){rLeft = false; rStraight = true; rRight = false;}
                     jButton1.setVisible(false);
                     jButton2.setVisible(false);
-                    ms+=11;
+                    ms+=;
                     if(ms>=1000){
                         ms-=1000;
                         sec++;
