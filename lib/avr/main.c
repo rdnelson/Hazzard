@@ -31,16 +31,22 @@ void platform_init(){
   DDRD |= (1 << PORTD3 | 1 << PORTD4);
   DDRB |= _BV(PORTB1) | _BV(PORTB2);
   
+  DDRD |= _BV(PORTD5) | _BV(PORTD6);
+  
     // set PWM for 25% duty cycle @ 16bit
 
     TCCR1A |= (1 << COM1A1)|(1 << COM1B1);
     // set none-inverting mode
 
-    TCCR1A |= (1 << WGM10);
-    TCCR1B |= (1 << WGM12);
-    // set Fast PWM mode using 8-bit PWM as TOP
-    
-    TCCR1B |= (1 << CS10);
+
+        TCCR1B = 0;
+
+        // set timer 1 prescale factor to 64
+        TCCR1B |= _BV(CS11);
+        TCCR1B |= _BV(CS10);
+
+        // put timer 1 in 8-bit phase correct pwm mode
+         TCCR1A |= _BV(WGM10);
   
   libspi_init();
 
@@ -123,13 +129,13 @@ PRINT_REG(FIFO_STATUS);
 inline void set_pwm_fwd(uint8_t val){
 	if (val == 0)
 	{
-		TCCR1A |=  ~_BV(COM1A1);
-		PORTB  |= ~_BV(PORTB1);
+		TCCR1A &=  ~_BV(COM1A1);
+		PORTB  &= ~_BV(PORTB1);
 	}
 	else{
 	
                   TCCR1A |= _BV(COM1A1);
-                  OCR1A = 255 - val; // set pwm duty
+                  OCR1A =  val; // set pwm duty
 
 	
 	}
@@ -138,13 +144,13 @@ inline void set_pwm_fwd(uint8_t val){
 inline void set_pwm_rev(uint8_t val){
 	if (val == 0)
 	{
-		TCCR1A |=  ~_BV(COM1B1);
-		PORTB  |= ~_BV(PORTB2);
+		TCCR1A &=  ~_BV(COM1B1);
+		PORTB  &= ~_BV(PORTB2);
 	}
 	else{
 	
                   TCCR1A |= _BV(COM1B1);
-                  OCR1B = 255 - val; // set pwm duty
+                  OCR1B = val; // set pwm duty
 
 	
 	}
@@ -152,27 +158,48 @@ inline void set_pwm_rev(uint8_t val){
 void command_handler(uint8_t* pCmd){
 
 	if (*pCmd == CMD_DRIVE){
-		uart_tx_string("drive command received");
+		uart_tx_string("<INFO>drive command received: velocity = ");
 		int16_t drive_offset =   *(pCmd+1) | *(pCmd+2) << 8;
 		itoa(drive_offset, &buffer[6], 10);
 		uart_tx_string(&buffer[6]);
-		int8_t turn_val = *(pCmd+3);	
+
+		int8_t turn_val = *(pCmd+3);			
+		uart_tx_string(" turn = ");
+		itoa(turn_val, &buffer[6], 10);
+		uart_tx_string(&buffer[6]);			
+		uart_tx_byte('\n');
+		
+
 		if (drive_offset == 0){
 		
 			set_pwm_fwd(0);
-			//set_pwm_rev(0);
+			set_pwm_rev(0);
 		
 		} else if (drive_offset > 0){
-			//set_pwm_rev(0);		
+			set_pwm_rev(0);		
 			set_pwm_fwd(drive_offset);
 		
 		} else
 		{
-	//		set_pwm_fwd(0);		
-	//		set_pwm_rev(-drive_offset);
+			set_pwm_fwd(0);		
+			set_pwm_rev(-drive_offset);
 		
 		
 		}
+		
+		if (turn_val < 0){
+			PORTD |= _BV(PORTD5);
+			PORTD &= ~_BV(PORTD6);
+		}else if (turn_val == 0){
+			PORTD &= ~_BV(PORTD5);
+			PORTD &= ~_BV(PORTD6);
+		}
+		else{
+			PORTD  |= _BV(PORTD6);
+			PORTD &= ~_BV(PORTD5);
+		}
+		
+		
 		
 	}
 }
