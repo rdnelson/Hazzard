@@ -1,5 +1,6 @@
-import xml.etree.ElementTree as ET 
+import xml.etree.ElementTree as ET
 import socket
+import threading
 import thread
 
 class Data:
@@ -7,34 +8,34 @@ class Data:
 		self.__dict__.update(kwds)
 	def __repr__(self):
 		return str(vars(self))
-		
+
 LOCAL_IP = socket.gethostbyname(socket.gethostname())
 MCAST_IP = '224.0.0.1'
 
 class Sender:
 	sock_send = socket.socket()
 	defaultPort = 0
-	
+
 	debug = False
-	
+
 	def __init__(self, port=9001):
 		self.defaultPort = port
-	
-		if self.debug: print 'Creating socket for sending'					
+
+		if self.debug: print 'Creating socket for sending'
 
 		# Create a socket for sending
 		self.sock_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 		self.sock_send.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
-		
-		if self.debug: 
+
+		if self.debug:
 			print 'Socket created'
 			print 'Init finished'
 			print ''
-		
+
 	def setDefaultPort(self, port):
 		if self.debug: print 'Setting default port to ', port
 		self.defaultPort = port
-		
+
 	def sendAsync(self, tag, port=None, **kwargs):
 		if port is None: port = self.defaultPort
 		if self.debug: print 'Sending asyncData ' + tag + ' to ', port
@@ -44,7 +45,7 @@ class Sender:
 			node.set(key, value)
 		self.sock_send.sendto(ET.tostring(root), (MCAST_IP, port))
 		if self.debug: print 'AsyncData sent'
-		
+
 	def sendUpdate(self, data, name, port=None):
 		if port is None: port = self.defaultPort
 		if self.debug: print 'Sending syncData: ' + name + ' to ', port
@@ -53,7 +54,7 @@ class Sender:
 		self.__addNodes(dataNode, vars(data))
 		self.sock_send.sendto(ET.tostring(root), (MCAST_IP, port))
 		if self.debug: print 'Data sent: ' + ET.tostring(root)
-		
+
 	def __addNodes(self, root, items):
 		for name, value in items.iteritems():
 			newNode = ET.SubElement(root, name)
@@ -66,47 +67,49 @@ class Sender:
 				if type(value) == int:
 					newNode.set('Type', 'Integer')
 				newNode.text = str(value)
-		
+
 class Receiver:
 	callbacks = dict()
 	__data = Data()
 	sock_receive = socket.socket()
 
 	SERVER_ADDRESS = ()
-	
+
 	debug = False
-	
+
 	def __init__(self, port=9001):
 		self.__setPort(port)
-		
+
 		if self.debug: print 'Creating socket for receiving'
-		
+
 		# Create the socket for receiving
 		self.sock_receive.settimeout(None)
 		self.sock_receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 		self.sock_receive.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self.sock_receive.bind(self.SERVER_ADDRESS)
-		
+
 		if self.debug: print 'Socket created, bound to ', port
 
 		if self.debug: print 'Joining multicast group'
-		
+
 		# Join the multicast group
 		self.sock_receive.setsockopt(socket.IPPROTO_IP,
 									 socket.IP_ADD_MEMBERSHIP,
 									 socket.inet_aton(MCAST_IP) + socket.inet_aton(LOCAL_IP))
 
-		if self.debug: 
+		if self.debug:
 			print 'Init finished'
 			print ''
 
-		thread.start_new_thread(self.receiver, ())
-		
+		self.thread = threading.Thread(target=self.receiver, args=())
+		self.thread.daemon = True
+		self.thread.start()
+
 	def __setPort(self, port):
 		if self.debug: print 'Setting receive port to ', port
 		self.SERVER_ADDRESS = ('', port)
-		
-		
+
+
 	def receiver(self):
 		while True:
 			try:
@@ -119,18 +122,22 @@ class Receiver:
 	def addCallback(self, tag, callbackFunction):
 		self.callbacks.update({tag:callbackFunction})
 		if self.debug: print 'Added callback: ' + tag
-		
+
 	def removeCallback(self, tag):
 		if self.debug: 'Removing callback: ' + tag
 		return self.callbacks.pop(tag,False)
-		
+
 	def clearCallbacks(self):
 		self.callbacks.clear()
 		if self.debug: 'Clearing callbacks'
-		
+
 	def getData(self, whatData):
 		if self.debug: print 'Getting ' + whatData + ' syncData'
 		return getattr(self.__data, whatData)
+
+	def hibernate(self):
+		while True:
+			self.thread.join(1)
 
 	def parse(self, text):
 		if self.debug: print 'Parsing'
@@ -143,7 +150,7 @@ class Receiver:
 				for dataNode in list(node):
 					self.__addItem(nodeClass, dataNode)
 				setattr(self.__data, node.tag, nodeClass)
-		
+
 		elif root.tag == 'asyncData':
 			if self.debug: print 'Parsing asyncData'
 			for node in list(root):
