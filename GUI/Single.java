@@ -77,7 +77,9 @@ public class Single extends javax.swing.JFrame {
                         }                                
                     }                    
                 }
-                jTextField4.setText("V1\n");
+                
+                jTextField4.setText(String.format("%.2f", vl));
+                
                 if(lLeft){
                     jLabel5.setVisible(true);
                 }else{
@@ -115,9 +117,10 @@ public class Single extends javax.swing.JFrame {
                 if(start){
                     jButton1.setVisible(false);
                     if(sec==9&&ms==9){lFinish=true;}
-                    if(sec==2&&ms==2){lLeft = true; lStraight = false; lRight = false;}
-                    if(sec==4&&ms==4){lLeft = false; lStraight = false; lRight = true;}
-                    if(sec==7&&ms==7){lLeft = false; lStraight = true; lRight = false;}
+                    if(sec==2&&ms==2){lLeft=true; lStraight= false; lRight=false;}
+                    if(sec==4&&ms==4){lLeft=false; lStraight= false; lRight=true;}
+                    if(sec==7&&ms==7){lLeft=false; lStraight= true; lRight=false;}
+                    if(sec<9){vl+=0.02;}else{vl=0;}
                     ms+=7;
                     if(ms>=1000){
                         ms-=1000;
