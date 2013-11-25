@@ -94,8 +94,10 @@ public class GameStats extends javax.swing.JFrame {
                     }
                     arrive++;
                 }
-                jTextField4.setText("V1\n");
-                jTextField5.setText("V2\n");
+                
+                jTextField4.setText(String.format("%.2f", vl));
+                jTextField5.setText(String.format("%.2f", vr));
+                
                 if(lLeft){
                     jLabel5.setVisible(true);
                 }else{
@@ -151,13 +153,15 @@ public class GameStats extends javax.swing.JFrame {
                 
                 if(start){
                     if(sec==9&&ms==9){lFinish=true;}
-                    if(sec==2&&ms==2){lLeft = true; lStraight = false; lRight = false;}
-                    if(sec==4&&ms==4){lLeft = false; lStraight = false; lRight = true;}
-                    if(sec==7&&ms==7){lLeft = false; lStraight = true; lRight = false;}
-                    if(sec==11&&ms==473){rFinish=true;}
-                    if(sec==4&&ms==4){rLeft = true; rStraight = false; rRight = false;}
-                    if(sec==6&&ms==6){rLeft = false; rStraight = false; rRight = true;}
-                    if(sec==9&&ms==9){rLeft = false; rStraight = true; rRight = false;}
+                    if(sec==2&&ms==2){lLeft=true; lStraight= false; lRight=false;}
+                    if(sec==4&&ms==4){lLeft=false; lStraight= false; lRight=true;}
+                    if(sec==7&&ms==7){lLeft=false; lStraight= true; lRight=false;}
+                    if(sec<9){vl+=0.02;}else{vl=0;}
+                    if(sec==11&&ms==473){rFinish=true;}  
+                    if(sec==4&&ms==4){lLeft=true; lStraight= false; lRight=false;}
+                    if(sec==6&&ms==6){lLeft=false; lStraight= false; lRight=true;}
+                    if(sec==9&&ms==9){lLeft=false; lStraight= true; lRight=false;}
+                    if(sec<11){vr+=0.01;}else{vr=0;}
                     jButton1.setVisible(false);
                     jButton2.setVisible(false);
                     ms+=;
