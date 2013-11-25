@@ -31,6 +31,7 @@ public class GameStats extends javax.swing.JFrame {
     int countDown = 300;
     int lMin = 99, lSec = 99, lMs = 999;
     int rMin = 99, rSec = 99, rMs = 999;
+    double vl = 0, vr = 0;
     
     public GameStats() {
         initComponents();
@@ -164,7 +165,7 @@ public class GameStats extends javax.swing.JFrame {
                     if(sec<11){vr+=0.01;}else{vr=0;}
                     jButton1.setVisible(false);
                     jButton2.setVisible(false);
-                    ms+=;
+                    ms+=7;
                     if(ms>=1000){
                         ms-=1000;
                         sec++;
