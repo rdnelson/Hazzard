@@ -1,4 +1,3 @@
-
 import static java.awt.Color.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -116,7 +115,10 @@ public class Single extends javax.swing.JFrame {
                 if(start){
                     jButton1.setVisible(false);
                     if(sec==2&&ms==574){lFinish=true;}
-                    ms+=11;
+                    if(sec==2&&ms==2){lLeft = true; lStraight = false; lRight = false;}
+                    if(sec==4&&ms==4){lLeft = false; lStraight = false; lRight = true;}
+                    if(sec==7&&ms==7){lLeft = false; lStraight = true; lRight = false;}
+                    ms+=7;
                     if(ms>=1000){
                         ms-=1000;
                         sec++;
