@@ -158,9 +158,9 @@ public class GameStats extends javax.swing.JFrame {
                     if(sec==7&&ms==7){lLeft=false; lStraight= true; lRight=false;}
                     if(sec<9){vl+=0.02;}else{vl=0;}
                     if(sec==11&&ms==473){rFinish=true;}  
-                    if(sec==4&&ms==4){lLeft=true; lStraight= false; lRight=false;}
-                    if(sec==6&&ms==6){lLeft=false; lStraight= false; lRight=true;}
-                    if(sec==9&&ms==9){lLeft=false; lStraight= true; lRight=false;}
+                    if(sec==4&&ms==4){rLeft=true; rStraight= false; rRight=false;}
+                    if(sec==6&&ms==6){rLeft=false; rStraight= false; rRight=true;}
+                    if(sec==9&&ms==9){rLeft=false; rStraight= true; rRight=false;}
                     if(sec<11){vr+=0.01;}else{vr=0;}
                     jButton1.setVisible(false);
                     jButton2.setVisible(false);
