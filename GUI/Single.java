@@ -1,3 +1,4 @@
+
 import static java.awt.Color.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,15 +30,39 @@ public class Single extends javax.swing.JFrame {
     
     public Single() {
         initComponents();
-        jButton2.setVisible(false);
-        jButton3.setVisible(false);
-        ActionListener update;
+        jButton2.setVisible(false); //Try agian button hidden
+        jButton3.setVisible(false); //Result button hidden
+        class Clock extends Thread{ //clock
+            @Override
+            public void run(){
+                while(true){
+                    try{
+                        sleep(1);
+                        if(start){
+                            ms++;
+                            if(ms>=1000){
+                                ms-=1000;
+                                sec++;
+                            }
+                            if(sec==60){
+                                sec=0;
+                                min++;
+                            }    
+                        }
+                    }catch(Exception e){
+                        System.out.println(e);
+                    }                    
+                }
+            }
+        }
+        Clock t = new Clock();
+        t.start();
+        
+        ActionListener update;  //ActionListener
         update = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(ms<100){
-                //    jTextField2.setText("00"+Integer.toString(ms));
-                //}else if(ms<100){
+                if(ms<100){ //main clock logic
                     jTextField2.setText("0"+Integer.toString(ms/10));
                 }else{
                     jTextField2.setText(Integer.toString(ms/10));
@@ -52,7 +77,8 @@ public class Single extends javax.swing.JFrame {
                 }else{
                     jTextField1.setText(Integer.toString(min));
                 }
-                if(lFinish){
+                
+                if(lFinish){    //left car reaches the end
                     lFinish = false;
                     jTextField5.setText(jTextField1.getText()); 
                     jTextField7.setText(jTextField3.getText());
@@ -63,7 +89,8 @@ public class Single extends javax.swing.JFrame {
                     jButton1.setVisible(false);
                     jButton2.setVisible(true);
                     jButton3.setVisible(true);
-                    if(min<minRecord){
+                    
+                    if(min<minRecord){  //best record saved
                         minRecord = min;
                         secRecord = sec;
                         msRecord = ms;                   
@@ -79,9 +106,9 @@ public class Single extends javax.swing.JFrame {
                     }                    
                 }
                 
-                jTextField4.setText(String.format("%.2f", vl));
+                jTextField4.setText(String.format("%.2f", vl)); //refresh the speed of left car
                 
-                if(lLeft){
+                if(lLeft){  //direction detector
                     jLabel5.setVisible(true);
                 }else{
                     jLabel5.setVisible(false);
@@ -97,7 +124,7 @@ public class Single extends javax.swing.JFrame {
                     jLabel6.setVisible(false);
                 }
                 
-                if(lReady&&!start){
+                if(lReady&&!start){ ////countDown for start
                     if(countDown>150){
                         jTextField1.setBackground(red);
                         jTextField3.setBackground(red);
@@ -116,33 +143,22 @@ public class Single extends javax.swing.JFrame {
                 }
                 
                 if(start){
-                    jButton1.setVisible(false);
-                    if(sec==9&&ms==9){lFinish=true;}
-                    if(sec==2&&ms==2){lLeft=true; lStraight= false; lRight=false;}
-                    if(sec==4&&ms==4){lLeft=false; lStraight= false; lRight=true;}
-                    if(sec==7&&ms==7){lLeft=false; lStraight= true; lRight=false;}
-                    if(sec<9){vl+=0.02;}else{vl=0;}
-                    ms+=7;
-                    if(ms>=1000){
-                        ms-=1000;
-                        sec++;
-                    }
-                    if(sec==60){
-                        sec=0;
-                        min++;
-                    }
+                    jButton1.setVisible(false); //left Ready button hidden
+/*                    if(sec==9){lFinish=true;}
+                    if(sec==2){lLeft=true; lStraight= false; lRight=false;}
+                    if(sec==4){lLeft=false; lStraight= false; lRight=true;}
+                    if(sec==7){lLeft=false; lStraight= true; lRight=false;}
+                    if(sec<3){vl+=0.02;}else{vl=0;}       
+*/
                 }
             }
         };
-        //String time = time();
-        //System.out.printf(time);
         Timer timer = new Timer(1, update);
         timer.setRepeats(true);
-        timer.start();
-        
+        timer.start();        
     }
     
-    public Single(int i) {
+    public Single(int i) {  //receive difficulty level from Start.java
         this();
         if(i==1){
             mode = "Easy";
@@ -151,7 +167,7 @@ public class Single extends javax.swing.JFrame {
         }else{
             mode = "Legendary";
         }
-        jLabel15.setText(mode);
+        jLabel15.setText(mode); //print it out
     }
 
     /**
@@ -374,19 +390,19 @@ public class Single extends javax.swing.JFrame {
 
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
         // TODO add your handling code here:
-        jButton2.setVisible(false);
-        jButton3.setVisible(false);
-        jButton1.setVisible(true);        
-        lFinish = false;      //finish signal
-        lLeft = false;
+        jButton2.setVisible(false); //Try agian button hidden
+        jButton3.setVisible(false); //Result button hidden
+        jButton1.setVisible(true);  //Ready button shown
+        lFinish = false;      //finish signal reset
+        lLeft = false;        //directions reset
         lStraight = true;
-        lRight = false;    //direction signal for left car
+        lRight = false;    
         min = 0;
         sec = 0;
-        ms = 0;       //clock
-        lReady = false;
-        start = false;     //inital status
-        countDown = 300;
+        ms = 0;       //clock reset
+        lReady = false;    //ready button reset
+        start = false;     //game status reset
+        countDown = 300;    //countDown reset
         jTextField1.setBackground(white);
         jTextField3.setBackground(white);
         jTextField2.setBackground(white);
@@ -401,7 +417,7 @@ public class Single extends javax.swing.JFrame {
 
     private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
         // TODO add your handling code here:
-        new Record(minRecord, secRecord, msRecord).setVisible(true);
+        new Record(minRecord, secRecord, msRecord).setVisible(true); //open Record frame $$$send record
         this.setVisible(false);
     }//GEN-LAST:event_jButton3MouseClicked
 

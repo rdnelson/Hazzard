@@ -1,3 +1,4 @@
+
 //import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.time;
 import static java.awt.Color.*;
 import java.awt.event.ActionEvent;
@@ -35,16 +36,40 @@ public class GameStats extends javax.swing.JFrame {
     
     public GameStats() {
         initComponents();
-        jButton3.setVisible(false);
-        ActionListener update;
+        jButton3.setVisible(false); //Next button hidden
+        class Clock extends Thread{ //clock
+            @Override
+            public void run(){
+                while(true){
+                    try{
+                        sleep(1);
+                        if(start){
+                            ms++;
+                            if(ms>=1000){
+                                ms-=1000;
+                                sec++;
+                            }
+                            if(sec==60){
+                                sec=0;
+                                min++;
+                            }    
+                        }
+                    }catch(Exception e){
+                        System.out.println(e);
+                    }                    
+                }
+            }
+        }
+        Clock t = new Clock();
+        t.start();
+        
+        ActionListener update;  //ActionListener
         update = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //long startTime=System.currentTimeMillis();
-                if(ms<100){
+                if(ms<100){ //main clock logic
                     jTextField2.setText("0"+Integer.toString(ms/10));
-                //}else if(ms<100){
-                    //jTextField2.setText(Integer.toString(ms/10));
                 }else{
                     jTextField2.setText(Integer.toString(ms/10));
                 }
@@ -58,7 +83,8 @@ public class GameStats extends javax.swing.JFrame {
                 }else{
                     jTextField1.setText(Integer.toString(min));
                 }
-                if(lFinish){
+                
+                if(lFinish){    //left car reaches the end
                     lFinish = false;
                     lMin = min;
                     lSec = sec;
@@ -76,7 +102,7 @@ public class GameStats extends javax.swing.JFrame {
                         jTextField6.setBackground(red);                        
                     }
                     arrive++;
-                }else if(rFinish){
+                }else if(rFinish){  //right car reaches the end
                     rFinish = false;
                     rMin = min;
                     rSec = sec;
@@ -96,10 +122,10 @@ public class GameStats extends javax.swing.JFrame {
                     arrive++;
                 }
                 
-                jTextField4.setText(String.format("%.2f", vl));
-                jTextField5.setText(String.format("%.2f", vr));
+                jTextField4.setText(String.format("%.2f", vl)); //refresh speed of left car
+                jTextField5.setText(String.format("%.2f", vr)); //refresh speed of right car
                 
-                if(lLeft){
+                if(lLeft){  //direction detector
                     jLabel5.setVisible(true);
                 }else{
                     jLabel5.setVisible(false);
@@ -130,7 +156,7 @@ public class GameStats extends javax.swing.JFrame {
                     jLabel10.setVisible(false);
                 }
                 
-                if(rReady&&lReady&&!start){
+                if(rReady&&lReady&&!start){ //countDown for start
                     if(countDown>150){
                         jTextField1.setBackground(red);
                         jTextField3.setBackground(red);
@@ -140,7 +166,7 @@ public class GameStats extends javax.swing.JFrame {
                         jTextField3.setBackground(yellow);
                         jTextField2.setBackground(yellow);
                     }else{
-                        start=true;
+                        start=true; //start the game $$$send signal
                         jTextField1.setBackground(green);
                         jTextField3.setBackground(green);
                         jTextField2.setBackground(green);                        
@@ -153,7 +179,7 @@ public class GameStats extends javax.swing.JFrame {
                 }
                 
                 if(start){
-                    if(sec==9&&ms==9){lFinish=true;}
+/*                  if(sec==9&&ms==9){lFinish=true;}
                     if(sec==2&&ms==2){lLeft=true; lStraight= false; lRight=false;}
                     if(sec==4&&ms==4){lLeft=false; lStraight= false; lRight=true;}
                     if(sec==7&&ms==7){lLeft=false; lStraight= true; lRight=false;}
@@ -163,17 +189,9 @@ public class GameStats extends javax.swing.JFrame {
                     if(sec==6&&ms==6){rLeft=false; rStraight= false; rRight=true;}
                     if(sec==9&&ms==9){rLeft=false; rStraight= true; rRight=false;}
                     if(sec<11){vr+=0.01;}else{vr=0;}
-                    jButton1.setVisible(false);
-                    jButton2.setVisible(false);
-                    ms+=7;
-                    if(ms>=1000){
-                        ms-=1000;
-                        sec++;
-                    }
-                    if(sec==60){
-                        sec=0;
-                        min++;
-                    }
+*/
+                    jButton1.setVisible(false); //lefr Ready button hidden
+                    jButton2.setVisible(false); //right Ready button hidden
                 }
                 //long endTime=System.currentTimeMillis();
                 //System.out.printf("Running time :"+ (endTime-startTime)+"ms\n");
@@ -187,7 +205,7 @@ public class GameStats extends javax.swing.JFrame {
         
     }
     
-    public GameStats(int i) {
+    public GameStats(int i) {   //receive difficulty level from Start.java
         this();
         if(i==1){
             mode = "Easy";
@@ -196,7 +214,7 @@ public class GameStats extends javax.swing.JFrame {
         }else{
             mode = "Legendary";
         }
-        jLabel15.setText(mode);
+        jLabel15.setText(mode); //print it out
     }
 
     /**
@@ -495,17 +513,17 @@ public class GameStats extends javax.swing.JFrame {
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
         // TODO add your handling code here:
-        lReady = true;
+        lReady = true;  //left car ready
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
         // TODO add your handling code here:
-        rReady = true;
+        rReady = true;  //right car ready
     }//GEN-LAST:event_jButton2MouseClicked
 
     private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
         // TODO add your handling code here:
-        new Result(lMin,lSec,lMs,rMin,rSec,rMs).setVisible(true);
+        new Result(lMin,lSec,lMs,rMin,rSec,rMs).setVisible(true);   //open result frame $$$send result
         this.setVisible(false);
     }//GEN-LAST:event_jButton3MouseClicked
 
