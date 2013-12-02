@@ -4,9 +4,7 @@ def getPositions(players):
     for player in range(len(players)):
         player_times[player] = players[player].laps
 
-    times = player_times.items()
-    times.sort(cmpPlayerLap)
-    return map(lambda item: item[0], times) # return the key (player #) in sorted order
+    return _getPositions(player_times)
 
 def _getPositions(player_times):
     times = player_times.items()
