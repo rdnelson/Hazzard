@@ -105,6 +105,9 @@ class Receiver:
 		self.thread.daemon = True
 		self.thread.start()
 
+	def close(self):
+		self.sock_receive.close()
+
 	def __setPort(self, port):
 		if self.debug: print 'Setting receive port to ', port
 		self.SERVER_ADDRESS = ('', port)
