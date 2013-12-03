@@ -1,4 +1,4 @@
-from PiNet import *
+from PiNetJython import *
 
 class SongData(Data):
 	def __init__(self):

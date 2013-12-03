@@ -1,7 +1,7 @@
-from PiNet import *
+from PiNetJython import *
 
 pn = Receiver() #Blank defaults to 9001
-pn.debug = False
+pn.debug = True
 
 def CallbackFoo(name, age):
 	print 'His name is ' + name + ', he is ' + age + ' years old.'
