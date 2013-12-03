@@ -1,7 +1,20 @@
+Dec. 3rd 2103
+GameStats.java
+jTextField12: ¡°LAP¡±
+jTextField13: Lap of left car.
+jTextField14: ¡°LAP¡±
+jTextField15: Lap of right car.
+
+Single.java
+jTextField14: ¡°LAP¡±
+jTextField15: Lap of left car.
+
+
+
 Nov. 30th 2013
 I was in hospital since Wednesday and will still be there for several days. Hope I can go to the class on Monday. Here are the descriptions of three frames I left last time. Start.java is very simple, only receiving game settings and pass to CS, and then status frame comes out.
-For Result.java nad Record.java, I think if we connect GameStats.java and Single.java with CS and receive result of the game from there, the only thing need to connected are â€œRePlayâ€ and â€œExitâ€ buttons. 
-I did do comments on these three frames. 3G signal is so weak in here. I canâ€™t even sync.
+For Result.java nad Record.java, I think if we connect GameStats.java and Single.java with CS and receive result of the game from there, the only thing need to connected are ¡°RePlay¡± and ¡°Exit¡± buttons. 
+I did do comments on these three frames. 3G signal is so weak in here. I can¡¯t even sync.
 
 Start.java
 jButton1: Practise button. Click jButton1, jButton2 will be hidden and jButton 3,4,5,6,7 will be shown. 
@@ -11,10 +24,10 @@ jButton4,5,6: Different difficulty levels buttons. When clicked, pass difficulty
 jButton7: Exit button. Click jButton7 will exit this program. 
 
 Result.java
-jTextFields1: â€œHAZZARD WINNERâ€
-jTextFields2: result of the game passed from GameStats.java. Can be â€œPlayer ONEâ€ which is left car, â€œPlayer TWOâ€ which is right car, or â€œTIEâ€.
-jTextFields3: â€œPlayer ONEâ€
-jTextFields4: â€œPlayer TWOâ€
+jTextFields1: ¡°HAZZARD WINNER¡±
+jTextFields2: result of the game passed from GameStats.java. Can be ¡°Player ONE¡± which is left car, ¡°Player TWO¡± which is right car, or ¡°TIE¡±.
+jTextFields3: ¡°Player ONE¡±
+jTextFields4: ¡°Player TWO¡±
 jTextFields6: millisecond of Left car result
 jTextFields7: minute of Left car result.
 jTextFields8: second of Left car result
@@ -25,14 +38,15 @@ Three digits millisecond result will show the exactly result of each player.
 jButton1: RePlay button. Go back to Start.java.
 jButton2: Exit button. Click jButton2 will exit this program.
 Record.java
-jTextFields1: â€œHAZZARDâ€
-jTextFields2: â€œBEST RECORDâ€
+jTextFields1: ¡°HAZZARD¡±
+jTextFields2: ¡°BEST RECORD¡±
 jTextFields5: minute of Left car best record.
 jTextFields6: second of Left car best record.
 jTextFields7: millisecond of Left car best record.
 Three digits millisecond record will show the exactly record of best trial.
 jButton1: RePlay button. Go back to Start.java.
 jButton2: Exit button. Click jButton2 will exit this program.
+
 
 
 
@@ -122,13 +136,20 @@ double vl. Speed of left car, initialed to 0, be refreshed in jTextField4 by Act
 
 
 
+
+
+
+
+
+
+
 Nov. 21st 2013
 There are totally four frames. 
-Start is for player(s) to choose the mode they want to play. They are ï¿½ï¿½Practiseï¿½ï¿½ mode which single player mode and ï¿½ï¿½Raceï¿½ï¿½ mode which is two players racing mode. Choose different mode will be given different second frame as game stats. There is an ï¿½ï¿½Exitï¿½ï¿½ button there to end the game at any time. When chose any mode, there will be three difficulty levels to choose. ï¿½ï¿½Easyï¿½ï¿½, ï¿½ï¿½Mediumï¿½ï¿½ and ï¿½ï¿½Legendryï¿½ï¿½ will also be shown in the coming game stats frame. As three difficulty levels are shown, there will be a ï¿½ï¿½Backï¿½ï¿½ button to level player go back to change his game mode.
-GameStats is racing mode game stats frame. It has a main clock in the center. Two sub-clocks to store playersï¿½ï¿½ records. Speed meters and direction monitors are below them. There are two ï¿½ï¿½Readyï¿½ï¿½ button for players to click when they are ready. When two ï¿½ï¿½Readyï¿½ï¿½ button are clicked, Main clock will have a count progress, changing background colour from ï¿½ï¿½redï¿½ï¿½ to ï¿½ï¿½yellowï¿½ï¿½ to ï¿½ï¿½greenï¿½ï¿½. When ï¿½ï¿½greenï¿½ï¿½ lights are on, game starts. With any player reach the finish line first, his time will be recorded on his own sub-clock and sub-clock back ground will be changed to ï¿½ï¿½greenï¿½ï¿½ to congratulate him. The other playerï¿½ï¿½s record will also be recorded when he reaches the end, but his sub-clock background will be changed to ï¿½ï¿½redï¿½ï¿½ to let him know his lose.
-Single is practise mode game stats frame. It is very simple like only left car of Racing mode is here in practise mode. Sub-clock is bigger and it can only be changed to green when reach the finish line. The only difference is there is a ï¿½ï¿½Try Againï¿½ï¿½ button to let player try the game again to get greater record. 
-Result is the frame shown the racing result. Player ONE which is left player and Player TWO is the left. Time will be record in form minute (2 digits), second (2 digits), millisecond (3 digits). WINNER will be shown on top textfield as ï¿½ï¿½Player ONEï¿½ï¿½, ï¿½ï¿½Player TWOï¿½ï¿½ or ï¿½ï¿½TIEï¿½ï¿½. ï¿½ï¿½RePlayï¿½ï¿½ button to go directly back to the beginning of the game. ï¿½ï¿½Exitï¿½ï¿½ to end the game.
-Record is the fame shown the practise record. Player best practise record will be shown in the middle form minute (2 digits), second (2 digits), millisecond (3 digits) as well. ï¿½ï¿½RePlayï¿½ï¿½ button to go directly back to the beginning of the game. ï¿½ï¿½Exitï¿½ï¿½ to end the game.
+Start is for player(s) to choose the mode they want to play. They are ¡®Practise¡¯ mode which single player mode and ¡®Race¡¯ mode which is two players racing mode. Choose different mode will be given different second frame as game stats. There is an ¡®Exit¡¯ button there to end the game at any time. When chose any mode, there will be three difficulty levels to choose. ¡®Easy¡¯, ¡®Medium¡¯ and ¡®Legendry¡¯ will also be shown in the coming game stats frame. As three difficulty levels are shown, there will be a ¡®Back¡¯ button to level player go back to change his game mode.
+GameStats is racing mode game stats frame. It has a main clock in the center. Two sub-clocks to store players¡¯ records. Speed meters and direction monitors are below them. There are two ¡®Ready¡¯ button for players to click when they are ready. When two ¡®Ready¡¯ button are clicked, Main clock will have a count progress, changing background colour from ¡®red¡¯ to ¡®yellow¡¯ to ¡®green¡¯. When ¡®green¡¯ lights are on, game starts. With any player reach the finish line first, his time will be recorded on his own sub-clock and sub-clock back ground will be changed to ¡®green¡¯ to congratulate him. The other player¡¯s record will also be recorded when he reaches the end, but his sub-clock background will be changed to ¡®red¡¯ to let him know his lose.
+Single is practise mode game stats frame. It is very simple like only left car of Racing mode is here in practise mode. Sub-clock is bigger and it can only be changed to green when reach the finish line. The only difference is there is a ¡®Try Again¡¯ button to let player try the game again to get greater record. 
+Result is the frame shown the racing result. Player ONE which is left player and Player TWO is the left. Time will be record in form minute (2 digits), second (2 digits), millisecond (3 digits). WINNER will be shown on top textfield as ¡°Player ONE¡±, ¡°Player TWO¡± or ¡°TIE¡±. ¡°RePlay¡± button to go directly back to the beginning of the game. ¡°Exit¡± to end the game.
+Record is the fame shown the practise record. Player best practise record will be shown in the middle form minute (2 digits), second (2 digits), millisecond (3 digits) as well. ¡°RePlay¡± button to go directly back to the beginning of the game. ¡°Exit¡± to end the game.
 
 
 Direction are all keep in Straight now. Can be detected by ActionListener().
