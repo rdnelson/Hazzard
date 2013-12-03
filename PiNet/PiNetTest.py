@@ -37,8 +37,8 @@ class TestReceiver(unittest.TestCase):
 		
 		self.receiver.clearCallbacks()
 		
-		self.assertFalse(self.receiver.removeCallback("Test1"))
-		self.assertFalse(self.receiver.removeCallback("Test2"))
+		self.assertFalse(self.receiver.callbacks.has_key("Test1"))
+		self.assertFalse(self.receiver.callbacks.has_key("Test2"))
 
 	def test_parse_syncdata_simple(self):
 		testData = "test!"
@@ -67,11 +67,11 @@ class TestReceiver(unittest.TestCase):
 		self.assertEquals(self.testText, "Simple callback")
 		
 	def test_parse_asyncdata_1kwarg(self):
-		testArg = "testArg data"
+		testArg1 = "testArg data"
 		self.receiver.addCallback("test", self.callback)
-		self.receiver.parse("<asyncData><test testArg='" + testArg + "'></test></asyncData>")
+		self.receiver.parse("<asyncData><test testArg='" + testArg1 + "'></test></asyncData>")
 		
-		self.assertEquals(self.testText, testArg)
+		self.assertEquals(self.testText, testArg1)
 		
 	def test_parse_asyncdata_2kwargs(self):
 		testArg = "testArg1 data"
