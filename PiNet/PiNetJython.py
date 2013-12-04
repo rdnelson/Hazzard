@@ -81,7 +81,7 @@ class Receiver:
 		if self.debug: print 'Creating socket for receiving'
 		
 		# Create the socket for receiving
-		self.sock_receive = MulticastSocket(InetSocketAddress("", port))
+		self.sock_receive = MulticastSocket(InetSocketAddress("0", port))
 		self.sock_receive.joinGroup(InetAddress.getByName(MCAST_IP))
 		self.sock_receive.setTimeToLive(2)
 		self.sock_receive.setSoTimeout(0)
@@ -111,8 +111,8 @@ class Receiver:
 			try:
 				if self.debug: print "Waiting for data"
 				self.sock_receive.receive(pack);
-				if self.debug: print "Got ", pack.getData()
-				self.parse(pack.getData())
+				if self.debug: print "Got ", pack.getData().tostring().strip()
+				self.parse(pack.getData().tostring())
 			except:
 				pass
 
