@@ -2,7 +2,10 @@ def getPositions(players):
     player_times = {}
 
     for player in range(len(players)):
-        player_times[player] = players[player].laps
+        if players[player] != None:
+            player_times[player] = players[player].laps
+        else:
+            player_times[player] = []
 
     return _getPositions(player_times)
 

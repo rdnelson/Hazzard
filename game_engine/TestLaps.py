@@ -24,6 +24,15 @@ class LapsTestCases(unittest.TestCase):
                            MockPlayer([]),
                            MockPlayer([])]
 
+        # Player 1 is in 3rd
+        # Player 2 is in 2nd
+        # Player 3 is in 4th
+        # Player 4 is in 1st
+        self.emptyPlayers = [None,
+                            MockPlayer([2,3,4,5]),
+                            None,
+                            MockPlayer([1,2,3,1])]
+
     def tearDown(self):
         self.racingPlayers = None
         self.startingPlayers = None
@@ -57,6 +66,10 @@ class LapsTestCases(unittest.TestCase):
     def testGetPositions(self):
         """Check that getPositions functions during a race"""
         assert laps.getPositions(self.racingPlayers) == [3,0,2,1], "Players sorted into incorrect positions"
+
+    def testGetEmptyPositions(self):
+        """Check that getPositions functions when some players are None"""
+        assert laps.getPositions(self.emptyPlayers) == [3,1,0,2], "Players sorted into incorrect positions"
 
 if __name__ == "__main__":
     unittest.main()
