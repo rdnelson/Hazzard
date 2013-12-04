@@ -21,7 +21,7 @@ public class Result extends javax.swing.JFrame {
         initComponents();
     }
 
-    Result(int lMin, int lSec, int lMs, int rMin, int rSec, int rMs) {
+    public Result(int lMin, int lSec, int lMs, int rMin, int rSec, int rMs) {
         this();
         this.lMin = lMin;
         this.lSec = lSec;
@@ -285,7 +285,7 @@ public class Result extends javax.swing.JFrame {
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
         // TODO add your handling code here:
-            new Start().setVisible(true);
+        new Start().setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_jButton1MouseClicked
 

@@ -32,6 +32,8 @@ public class Start extends javax.swing.JFrame {
     
     public Start() {
         initComponents(); 
+        jTextField1.setVisible(false);
+        jTextField2.setVisible(false);
         try {
             piNet.initialize();
         } catch (IOException e) {
@@ -43,6 +45,7 @@ public class Start extends javax.swing.JFrame {
                 raceInfo = (RaceInfo) piNet.getData("RaceInfo");
                 if(raceInfo.joinedPlayers == 1){
                     jTextField1.setVisible(true);
+                    jTextField2.setVisible(false);
                 }else if(raceInfo.joinedPlayers == 2){
                     jTextField2.setVisible(true);
                     jTextField1.setVisible(false);

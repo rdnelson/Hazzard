@@ -24,17 +24,15 @@ public class Single extends javax.swing.JFrame {
     /**
      * Creates new form Single
      */
-    boolean lFinish = false;      //finish signal
-    boolean lLeft = false, lStraight = true, lRight = false;    //direction signal for left car
+    int lFinish = 0;      //finish signal
     int min = 0, sec = 0, ms = 0;       //clock
-    String mode;    //difficulty level
-    boolean lReady = false, start = false;     //inital status
-    int countDown = 300;
-    int minRecord = 99, secRecord = 99, msRecord = 999;
-    double vl = 0;
+    int lMin = 99, lSec = 99, lMs = 999;
+    boolean start = false;     //inital status
+    int vl = 0;
     int llap = 0;
+    int direction = 0;
     RaceInfo raceInfo;
-    PlayerInfo playerInfo1, playerInfo2;
+    PlayerInfo playerInfo1;
     PiNet piNet = new PiNet();
     
     public Single(){
@@ -91,88 +89,65 @@ public class Single extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 raceInfo = (RaceInfo) piNet.getData("RaceInfo");
                 playerInfo1 = (PlayerInfo) piNet.getData("PlayerInfo1");
-                playerInfo2 = (PlayerInfo) piNet.getData("PlayerInfo2");
-                if(lFinish){    //left car reaches the end
-                    lFinish = false;
+                
+                llap = playerInfo1.currentLap;
+                vl = playerInfo1.speed;
+                direction = playerInfo1.turn;
+                lFinish = playerInfo1.flag;
+                
+                if(raceInfo.time<=-1500){
+                    jTextField1.setBackground(red);
+                    jTextField3.setBackground(red);
+                    jTextField2.setBackground(red); 
+                }else if(raceInfo.time<0){
+                    jTextField1.setBackground(yellow);
+                    jTextField3.setBackground(yellow);
+                    jTextField2.setBackground(yellow);
+                }else{
+                    start=true;
+                    jTextField1.setBackground(green);
+                    jTextField3.setBackground(green);
+                    jTextField2.setBackground(green);                        
+                }
+                                
+                if(lFinish==1){    //left car reaches the end
+                    lMin = min;
+                    lSec = sec;
+                    lMs = ms;
                     jTextField5.setText(jTextField1.getText()); 
                     jTextField7.setText(jTextField3.getText());
                     jTextField6.setText(jTextField2.getText());
                     jTextField5.setBackground(green);
                     jTextField7.setBackground(green);
-                    jTextField6.setBackground(green); 
-                    
-                    if(min<minRecord){  //best record saved
-                        minRecord = min;
-                        secRecord = sec;
-                        msRecord = ms;                   
-                    }else if(min==minRecord){
-                        if(sec<secRecord){
-                            secRecord = sec;
-                            msRecord = ms;
-                        }else if(ms==msRecord){
-                            if(ms<msRecord){
-                                msRecord = ms;
-                            }
-                        }                                
-                    }                    
+                    jTextField6.setBackground(green);               
                 }
                 
-                jTextField4.setText(String.format("%.2f", vl)); //refresh the speed of left car
+                jTextField4.setText(String.format("%d", vl)); //refresh the speed of left car
                 
-                if(lLeft){  //direction detector
+                if(direction == -1){  //direction detector
                     jLabel5.setVisible(true);
                 }else{
                     jLabel5.setVisible(false);
                 }
-                if(lStraight){
+                if(direction == 0){
                     jLabel7.setVisible(true);
                 }else{
                     jLabel7.setVisible(false);
                 }
-                if(lRight){
+                if(direction == 1){
                     jLabel6.setVisible(true);
                 }else{
                     jLabel6.setVisible(false);
                 }
                 
-                if(lReady&&!start){ ////countDown for start
-                    if(countDown>150){
-                        jTextField1.setBackground(red);
-                        jTextField3.setBackground(red);
-                        jTextField2.setBackground(red); 
-                    }else if(countDown>0){
-                        jTextField1.setBackground(yellow);
-                        jTextField3.setBackground(yellow);
-                        jTextField2.setBackground(yellow);
-                    }else{
-                        start=true;
-                        jTextField1.setBackground(green);
-                        jTextField3.setBackground(green);
-                        jTextField2.setBackground(green);                        
-                    }
-                    countDown--;
-                }
-                
-                if(start){
-    
+                if(lFinish==1){
+                    new Record(lMin, lSec, lMs).setVisible(true);
                 }
             }
         };
         Timer timer = new Timer(100, update);
         timer.setRepeats(true);
         timer.start();        
-    }
-    
-    public Single(int i) {  //receive difficulty level from Start.java
-        this();
-        if(i==1){
-            mode = "Easy";
-        }else if(i==2){
-            mode = "Medium";
-        }else{
-            mode = "Legendary";
-        }
-        jLabel15.setText(mode); //print it out
     }
 
     /**
@@ -199,7 +174,6 @@ public class Single extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         jTextField6 = new javax.swing.JTextField();
         jTextField7 = new javax.swing.JTextField();
-        jLabel15 = new javax.swing.JLabel();
         jTextField14 = new javax.swing.JTextField();
         jTextField15 = new javax.swing.JTextField();
 
@@ -262,9 +236,6 @@ public class Single extends javax.swing.JFrame {
         jTextField7.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         jTextField7.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
-        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
-        jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
         jTextField14.setEditable(false);
         jTextField14.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         jTextField14.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -289,9 +260,6 @@ public class Single extends javax.swing.JFrame {
                         .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(277, 277, 277)
-                        .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -350,8 +318,7 @@ public class Single extends javax.swing.JFrame {
                             .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(57, 57, 57)
-                        .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(216, 216, 216))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(110, 110, 110)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -366,8 +333,7 @@ public class Single extends javax.swing.JFrame {
                             .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 171, Short.MAX_VALUE)))
-                .addGap(79, 79, 79))
+                        .addGap(0, 250, Short.MAX_VALUE))))
         );
 
         pack();
@@ -411,7 +377,6 @@ public class Single extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

@@ -16,33 +16,33 @@ public class Record extends javax.swing.JFrame {
      * Creates new form NewJFrame
      */
     
-    int bestMin, bestSec,bestMs;
+    int lMin, lSec,lMs;
             
     public Record() {
         initComponents();
     }
 
-    public Record(int bestMin, int bestSec, int bestMs) {
+    public Record(int lMin, int lSec, int lMs) {
         this();
-        this.bestMin = bestMin;
-        this.bestSec = bestSec;
-        this.bestMs = bestMs;
-        if(bestMin<10){
-            jTextField5.setText("0"+Integer.toString(bestMin));
+        this.lMin = lMin;
+        this.lSec = lSec;
+        this.lMs = lMs;
+        if(lMin<10){
+            jTextField5.setText("0"+Integer.toString(lMin));
         }else{
-            jTextField5.setText(Integer.toString(bestMin));
+            jTextField5.setText(Integer.toString(lMin));
         }
-        if(bestSec<10){
-            jTextField7.setText("0"+Integer.toString(bestSec));
+        if(lSec<10){
+            jTextField7.setText("0"+Integer.toString(lSec));
         }else{
-            jTextField7.setText(Integer.toString(bestSec));
+            jTextField7.setText(Integer.toString(lSec));
         }
-        if(bestMs<10){
-            jTextField6.setText("00"+Integer.toString(bestMs));
-        }else if(bestMs<100){
-            jTextField6.setText("0"+Integer.toString(bestMs));
+        if(lMs<10){
+            jTextField6.setText("00"+Integer.toString(lMs));
+        }else if(lMs<100){
+            jTextField6.setText("0"+Integer.toString(lMs));
         }else{
-            jTextField6.setText(Integer.toString(bestMs));
+            jTextField6.setText(Integer.toString(lMs));
         }
     }
     /**
