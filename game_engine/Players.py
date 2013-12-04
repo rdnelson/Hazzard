@@ -48,6 +48,9 @@ def handleEffects(player):
 
 def triggerPowerup(player):
 
+    if players[player] == None:
+        return
+
     # Bail if there's no powerup
     if players[player].powerup == None:
         return
