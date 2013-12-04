@@ -111,39 +111,55 @@ def ControllerEvent(player, event, data):
     if race_info.State == JOINING:
         if DEBUG:
             print "Joining event=%d data=%d" % (event, data)
+
+        # If player hasn't joined and pressed A, join them
         if event == BUT_A and data == 1 and players[player] == None:
             print "Player %d is now ready" % (player + 1)
             players[player] = Players.PlayerState()
             player_infos[player] = PlayerInfo(race_info.JoinedPlayers + 1)
             race_info.JoinedPlayers += 1
             sender.sendUpdate(race_info, "RaceInfo")
+
+        # If joined player presses start, begin lap count selection
         if event == START and data == 1 and players[player] != None:
             print "Starting with current players"
             race_info.State = LAP_SELECT
             sender.sendUpdate(race_info, "RaceInfo")
+
+        # Ignoring all other input in this state
         elif DEBUG:
             print "Ignoring input until race begins"
         return
+
     elif race_info.State == LAP_SELECT:
+        # If player pressed up, increase lap count
         if event == UD and data == -32767 or event == DUP and data == 1:
             race_info.Laps += 1
+
+        # If player pressed down, decrease lap count
         elif event == UD and data == 32767 or event == DDOWN and data == 1:
             race_info.Laps -= 1
+
+            # Ensure at least one lap
             if race_info.Laps < 1:
                 race_info.Laps = 1
+
+        # If player pressed start, begin the countdown
         elif event == START and data == 1:
             race_info.State = COUNTDOWN
             sender.sendUpdate(race_info, "RaceInfo")
             print
             return
+
+        # Erase the current line, and return to the beginning
         print "%s[2K\r" % chr(27),
+
+        # Prompt for number of laps
         print "Please select number of Laps: %d" % race_info.Laps,
+        # Force buffer to flush (needed because no newline terminating print)
         sys.stdout.flush()
-        try:
-            sender.sendUpdate(race_info, "RaceInfo")
-        except Exception as e:
-            print e
-        return
+
+        sender.sendUpdate(race_info, "RaceInfo")
 
     elif race_info.State == COUNTDOWN:
         return
@@ -166,6 +182,7 @@ def ControllerEvent(player, event, data):
         send = True
     if (event == LR):
         send = True
+        # Parse xbox controller data
         if data == -32767:
             players[player].turn = -1
         if data == 0:
@@ -174,6 +191,7 @@ def ControllerEvent(player, event, data):
             players[player].turn = 1
         player_infos[player].Turn == players[player].turn
     if event == BUT_A and data == 1 and players[player].powerup != None:
+        # Player fired a powerup
         triggerPowerup(player)
 
     if send:
@@ -201,52 +219,70 @@ def ControllerEvent(player, event, data):
         if (DEBUG):
             print "Packet Sent"
 
+# Used to determine engine responsiveness
 def PingEvent():
     sender.sendAsync("Pong")
     sender.sendUpdate(race_info, "RaceInfo")
 
+# Triggered when player passes through gate
 def GateEvent(player):
     global players
     global num_finished
     global race_info
 
+    # Verify valid player number
     player = int(player)
     if player < 0 or player >= Players.MAX_PLAYERS:
         return
 
+    # Verify player is joined
     if players[player] == None:
         return
 
+    # Calculate total time
     timediff = datetime.now() - start_time
     secs = timediff.seconds + timediff.microseconds / 1000000.0
 
+    # Calculate current lap time
     if len(players[player].laps) != 0:
         secs -= sum(players[player].laps)
 
     print "Player %d finished lap %d of %d in %f seconds" % (player + 1, len(players[player].laps) + 1, race_info.Laps, secs)
 
+    # Add new lap time
     players[player].laps.append(round(secs, 3))
 
+    # If last lap
     if len(players[player].laps) == race_info.Laps:
+
+        # This player finished
         sender.sendAsync("PlayerFinish", player=str(player), time=str(sum(players[player].laps)))
         print "Player %d finished." % player
         num_finished += 1
         player_infos[player].Finished = True
         if DEBUG:
             print "# finished: %d, # total: %d" %(num_finished, race_info.JoinedPlayers)
+
+        # If all players are finished
         if num_finished == race_info.JoinedPlayers:
             sender.sendAsync("RaceFinish")
             race_info.State = FINISHED
             print "The race is over!"
             num_finished = 0
+
+    # If Player didn't finish
     elif len(players[player].laps) < race_info.Laps:
         sender.sendAsync("LapComplete", player=str(player), time=str(secs))
 
+    # Update positions
     positions = laps.getPositions(players)
-    player_infos[player].Position = positions.index(player)
     player_infos[player].RelativeTime = (sum(players[player].laps) - sum(players[posititions[0]].laps)) * 1000
     player_infos[player].CurrentLap += 1
-    sender.sendUpdate(player_infos[player], "PlayerInfo")
+
+    # Update each player
+    for p in range(Players.MAX_PLAYERS):
+        player_infos[p].Position = positions.index(p)
+        sender.sendUpdate(player_infos[p], "PlayerInfo")
 
 
 #Validate the powerups schema
@@ -271,13 +307,21 @@ powerups = Powerups.parse("./powerups.xml").get_powerup()
 if __name__ == "__main__":
     if DEBUG:
         print "Setting up PiNet connection"
+
+    # Register PiNet callbacks
     receiver.addCallback("ControllerEvent", ControllerEvent)
     receiver.addCallback("CarPassed", GateEvent)
     receiver.addCallback("Ping", PingEvent)
 
+    # Create timer for time based changes (effects wearing off, etc.)
+    timer = Timer(0.1, TimeEvent)
+
     try:
+        # Game loop, should run forever (Who wants to quit?)
         while True:
             print "Waiting for players to confirm (Press A)"
+
+            # Wait for all players to be ready
             while race_info.State == JOINING:
                 sleep(0.25)
                 ready = True
@@ -287,29 +331,36 @@ if __name__ == "__main__":
                     race_info.State = LAP_SELECT
                     sender.sendUpdate(race_info, "RaceInfo")
 
+            # Get number of laps
             print "Please select number of Laps: %d" % race_info.Laps,
+
+            # Necessary because of subsequent VT100 commands
             sys.stdout.flush()
+
+            # Sleep until ControllerEvent updates race_info.State
             while race_info.State == LAP_SELECT:
                 sleep(0.25)
 
+            # Countdown has begun
             print "All players are ready. Starting race in:"
             for i in range(3,0,-1):
                 print i
                 sender.sendAsync("Countdown", count=str(i))
 
+                # Update current time to negative value for GUI
                 race_info.Time = -i*1000
                 sender.sendUpdate(race_info, "RaceInfo")
 
                 sleep(1)
 
+            # Game has begun
             print "Go!"
-
-            sender.sendAsync("GameStart")
-
             start_time = datetime.now()
+            sender.sendAsync("GameStart")
             race_info.State = RACING;
+            sender.sendUpdate(race_info, "RaceInfo")
 
-            timer = Timer(0.1, TimeEvent)
+            # Start event timer
             timer.start()
             if DEBUG:
                 print "Beginning event timer"
@@ -320,11 +371,13 @@ if __name__ == "__main__":
 
             print "Waiting to restart race. (Press Start)"
 
+            # Wait for ControllerEvent to update race_info.State
             while race_info.State == FINISHED:
                 sleep(0.25)
+
     except KeyboardInterrupt:
         pass
 
-        #receiver.hibernate()
+    # Set flag to kill TimeEvent thread
     shutdown = True
     print "Shutting down game engine."
