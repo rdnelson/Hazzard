@@ -177,10 +177,7 @@ public class Start extends javax.swing.JFrame {
                 } catch (IOException ex) {
                     Logger.getLogger(Start.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
-            
-            
-            
+            }            
         });
     }
 
