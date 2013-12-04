@@ -177,9 +177,6 @@ public class Start extends javax.swing.JFrame {
             public void run() {
                     new Start().setVisible(true);
             }
-            
-            
-            
         });
     }
 
