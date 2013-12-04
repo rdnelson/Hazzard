@@ -35,6 +35,7 @@ public class GameStats extends javax.swing.JFrame {
     double vl = 0, vr = 0;
     int llap = 0, rlap = 0;
     int relative = 0;
+    boolean finish = false;
     RaceInfo raceInfo;
     PlayerInfo playerInfo1;
     PlayerInfo playerInfo2;
@@ -258,13 +259,16 @@ public class GameStats extends javax.swing.JFrame {
                 if((lFinish==1)&&(rFinish==1)&&start){
                     new Result(lMin, lSec, lMs, rMin, rSec, rMs).setVisible(true);
                     start = false;
+                    finish = true;
                 }
                 
                 //long endTime=System.currentTimeMillis();
                 //System.out.printf("Running time :"+ (endTime-startTime)+"ms\n");
             }
         };
-
+        if(finish){
+            this.setVisible(false);
+        }
         Timer timer = new Timer(100, update);
         timer.setRepeats(true);
         timer.start();

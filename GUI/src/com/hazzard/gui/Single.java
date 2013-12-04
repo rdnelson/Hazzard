@@ -31,6 +31,7 @@ public class Single extends javax.swing.JFrame {
     int vl = 0;
     int llap = 0;
     int direction = 0;
+    boolean finish = false;
     RaceInfo raceInfo;
     PlayerInfo playerInfo1;
     PiNet piNet = new PiNet();
@@ -145,9 +146,13 @@ public class Single extends javax.swing.JFrame {
                 if(lFinish==1&&start){
                     new Record(lMin, lSec, lMs).setVisible(true);
                     start = false;
+                    finish = true;
                 }
             }
         };
+        if(finish){
+            this.setVisible(false);
+        }
         Timer timer = new Timer(100, update);
         timer.setRepeats(true);
         timer.start();        
