@@ -1,3 +1,14 @@
+Dec.4th 2013
+PiNet.java changed as much as I can.
+I still do not understand what Class Document is, and I can't run this package on my computer so I've no idea if I did correct.
+Start.java updated.
+Pracitse jTextFiled will be shown when first player join the game.
+Race jTexfTIeld will be shown with Practise jTextField being hidden when second player join the game.
+When time reaches -3, this frame will be hidden and Single or GameStats frame will be shown.
+I don't know if I can use raceInfo.joinedPlayers and raceInfo.time here.
+I think I can fix other frames to fit our requirements if I know how these variables can be called.
+All  Classes packed in com.hazzard.gui.
+
 Dec. 3rd 2103
 GameStats.java
 jTextField12: ¡°LAP¡±
