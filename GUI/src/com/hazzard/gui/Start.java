@@ -51,9 +51,6 @@ public class Start extends javax.swing.JFrame {
                     jTextField1.setVisible(false);
                 }
                 
-                if(raceInfo.time == -3000) {
-                    System.out.println("Should start");
-                }
                 if(raceInfo.time==-3000 && !start){
                     if(raceInfo.joinedPlayers == 2){
                         new GameStats().setVisible(true);

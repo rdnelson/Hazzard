@@ -103,6 +103,21 @@ public class GameStats extends javax.swing.JFrame {
                 rDirection = playerInfo2.turn;
                 rFinish = playerInfo2.finished;
                 
+                if(raceInfo.time<=-1500){
+                    jTextField1.setBackground(red);
+                    jTextField3.setBackground(red);
+                    jTextField2.setBackground(red); 
+                }else if(raceInfo.time<0){
+                    jTextField1.setBackground(yellow);
+                    jTextField3.setBackground(yellow);
+                    jTextField2.setBackground(yellow);
+                }else{
+                    start=true;
+                    jTextField1.setBackground(green);
+                    jTextField3.setBackground(green);
+                    jTextField2.setBackground(green);                        
+                }
+                
                  if(llap<rlap){    //left car reaches the end;
                     jTextField7.setText("0"); 
                     jTextField8.setText("0");
@@ -131,9 +146,9 @@ public class GameStats extends javax.swing.JFrame {
                  jTextField15.setText(String.format("%d", rlap));
                 
                 if((relative == 1)&&(llap==rlap)){
-                    relMin = playerInfo1.relativeTime/60000;
-                    relSec = (playerInfo1.relativeTime%60000)/1000;
-                    relMs = playerInfo1.relativeTime%1000;
+                    relMin = ((-1)*playerInfo1.relativeTime)/60000;
+                    relSec = (((-1)*playerInfo1.relativeTime)%60000)/1000;
+                    relMs = ((-1)*playerInfo1.relativeTime)%1000;
                     if(relMs<100){ //main clock logic
                         jTextField9.setText("0"+Integer.toString(relMs/10));
                     }else{
@@ -151,9 +166,9 @@ public class GameStats extends javax.swing.JFrame {
                     }                   
                     relative = 0;
                 }else if((relative == -1)&&(llap==rlap)){
-                    relMin = playerInfo1.relativeTime/60000;
-                    relSec = (playerInfo1.relativeTime%60000)/1000;
-                    relMs = playerInfo1.relativeTime%1000;
+                    relMin = ((-1)*playerInfo2.relativeTime)/60000;
+                    relSec = (((-1)*playerInfo1.relativeTime)%60000)/1000;
+                    relMs = ((-1)*playerInfo2.relativeTime)%1000;
                     if(relMs<100){ //main clock logic
                         jTextField7.setText("0"+Integer.toString(relMs/10));
                     }else{
@@ -240,28 +255,11 @@ public class GameStats extends javax.swing.JFrame {
                     jLabel10.setVisible(false);
                 }
                 
-                if(raceInfo.time<=-1500){
-                    jTextField1.setBackground(red);
-                    jTextField3.setBackground(red);
-                    jTextField2.setBackground(red); 
-                }else if(raceInfo.time<0){
-                    jTextField1.setBackground(yellow);
-                    jTextField3.setBackground(yellow);
-                    jTextField2.setBackground(yellow);
-                }else{
-                    start=true;
-                    jTextField1.setBackground(green);
-                    jTextField3.setBackground(green);
-                    jTextField2.setBackground(green);                        
-                }
-                
-                if((lFinish==1)&&(rFinish==1)){
+                if((lFinish==1)&&(rFinish==1)&&start){
                     new Result(lMin, lSec, lMs, rMin, rSec, rMs).setVisible(true);
+                    start = false;
                 }
                 
-                if(start){
-                    
-                }
                 //long endTime=System.currentTimeMillis();
                 //System.out.printf("Running time :"+ (endTime-startTime)+"ms\n");
             }

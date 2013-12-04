@@ -112,7 +112,7 @@ public class Single extends javax.swing.JFrame {
                 
                 jTextField15.setText(String.format("%d", llap));
                                 
-                if(lFinish==1){    //left car reaches the end
+                if(lFinish==1&&start){    //left car reaches the end
                     lMin = min;
                     lSec = sec;
                     lMs = ms;
@@ -142,8 +142,9 @@ public class Single extends javax.swing.JFrame {
                     jLabel6.setVisible(false);
                 }
                 
-                if(lFinish==1){
+                if(lFinish==1&&start){
                     new Record(lMin, lSec, lMs).setVisible(true);
+                    start = false;
                 }
             }
         };
