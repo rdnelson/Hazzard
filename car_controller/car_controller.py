@@ -11,16 +11,23 @@ sys.path.append("%s/../PiNet" % local_dir)
 import PiNet
 
 # Initialize PiNet
-rcv = PiNet.Receiver(9002)
+rcv = PiNet.Receiver()
 nrf_lib = cdll.LoadLibrary("%s/../lib/bcm2835/bcm2835.so" % local_dir)
+
+player_car = {}
+
+CAR_IDS = [0x0A, 0x0B]
 
 def CarEvent(player, speed, turn):
     cmd = "H"
     player = int(player)
+    if player_car.get(player) == None:
+        return
+    car = player_car[player]
     speed = int(speed)
     turn = int(turn)
-    print "Received CarEvent (Player: %d, Speed: %d, Turn: %d)" % (player, speed, turn)
-    if(player == 1):
+    print "Received CarEvent (Player: %d, Car: %d, Speed: %d, Turn: %d)" % (player, car, speed, turn)
+    if(car < len(CAR_IDS)):
         print "Prepping packet"
         cmd += chr(speed & 0xFF)
         cmd += chr((speed & 0xFF00) >> 8)
@@ -30,11 +37,29 @@ def CarEvent(player, speed, turn):
         ccmd = c_char_p(cmd)
 
         print "Sending packet to car"
+
+        nrf_lib.nrf_set_address_suffix(c_ubyte(CAR_IDS[car]))
         nrf_lib.nrf_send(ccmd, 4)
         while(nrf_lib.nfr_is_busy()):
-            pass;
+            pass
+
+def RegisterCar(player, car):
+    if car >= len(CAR_IDS):
+        return
+
+    player_car[player] = car
+    cmd = "I"
+    cmd += chr(player + 1)
+
+    ccmd = c_char_p(cmd)
+
+    nrf_lib.nrf_set_address_suffix(c_ubyte(CAR_IDS[car]))
+    nrf_lib.nrf_send(ccmd, 2);
+    while(nfr_lib.nrf_is_busy()):
+        pass
 
 rcv.addCallback("CarEvent", CarEvent)
+rcv.addCallback("RegisterCar", RegisterCar)
 
 CHANNEL=12
 PAYLOAD_SIZE=4
@@ -42,9 +67,12 @@ MODE_TX=1
 VEL = 128
 TURN = 1
 
+RegisterCar(0, 0)
+RegisterCar(1, 1)
+
 Packet = c_ubyte * 5
 
-tx_addr = Packet(0xDE, 0xAD, 0xBE, 0xEF, 0xD7)
+tx_addr = Packet(0x0A, 0xEF, 0xAD, 0xAD, 0xDE)
 rx_addr = Packet((0xE7), (0xE7), (0xC3), (0xE2), (0xE7))
 
 print "Initializing nrf24l01 connection..."
