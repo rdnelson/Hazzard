@@ -109,6 +109,8 @@ public class Single extends javax.swing.JFrame {
                     jTextField3.setBackground(green);
                     jTextField2.setBackground(green);                        
                 }
+                
+                jTextField15.setText(String.format("%d", llap));
                                 
                 if(lFinish==1){    //left car reaches the end
                     lMin = min;

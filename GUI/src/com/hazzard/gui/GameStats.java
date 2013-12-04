@@ -31,8 +31,10 @@ public class GameStats extends javax.swing.JFrame {
     int countDown = 300;
     int lMin = 99, lSec = 99, lMs = 999;
     int rMin = 99, rSec = 99, rMs = 999;
+    int relMin = 0, relSec = 0, relMs = 0;
     double vl = 0, vr = 0;
     int llap = 0, rlap = 0;
+    int relative = 0;
     RaceInfo raceInfo;
     PlayerInfo playerInfo1;
     PlayerInfo playerInfo2;
@@ -95,10 +97,80 @@ public class GameStats extends javax.swing.JFrame {
                 lDirection = playerInfo1.turn;
                 lFinish = playerInfo1.finished;
                 
+                
                 rlap = playerInfo2.currentLap;
                 vr = playerInfo2.speed;
                 rDirection = playerInfo2.turn;
                 rFinish = playerInfo2.finished;
+                
+                 if(llap<rlap){    //left car reaches the end;
+                    jTextField7.setText("0"); 
+                    jTextField8.setText("0");
+                    jTextField6.setText("0");
+                    jTextField7.setBackground(green);
+                    jTextField8.setBackground(green);
+                    jTextField6.setBackground(green);
+                    jTextField10.setBackground(red);
+                    jTextField11.setBackground(red);
+                    jTextField9.setBackground(red);
+                    relative = 1;
+                }else if(rlap<llap){  //right car reaches the end
+                    jTextField10.setText("0"); 
+                    jTextField11.setText("0");
+                    jTextField9.setText("0");
+                    jTextField10.setBackground(green);
+                    jTextField11.setBackground(green);
+                    jTextField9.setBackground(green);
+                    jTextField7.setBackground(red);
+                    jTextField8.setBackground(red);
+                    jTextField6.setBackground(red);
+                    relative = -1;
+                }            
+                 
+                 jTextField13.setText(String.format("%d", llap));
+                 jTextField15.setText(String.format("%d", rlap));
+                
+                if((relative == 1)&&(llap==rlap)){
+                    relMin = playerInfo1.relativeTime/60000;
+                    relSec = (playerInfo1.relativeTime%60000)/1000;
+                    relMs = playerInfo1.relativeTime%1000;
+                    if(relMs<100){ //main clock logic
+                        jTextField9.setText("0"+Integer.toString(relMs/10));
+                    }else{
+                        jTextField9.setText(Integer.toString(relMs/10));
+                    }
+                    if(relSec<10){
+                        jTextField11.setText("0"+Integer.toString(relSec));
+                    }else{
+                        jTextField11.setText(Integer.toString(relSec));
+                    }
+                    if(relMin<10){
+                        jTextField10.setText("0"+Integer.toString(relMin));
+                    }else{
+                        jTextField10.setText(Integer.toString(relMin));
+                    }                   
+                    relative = 0;
+                }else if((relative == -1)&&(llap==rlap)){
+                    relMin = playerInfo1.relativeTime/60000;
+                    relSec = (playerInfo1.relativeTime%60000)/1000;
+                    relMs = playerInfo1.relativeTime%1000;
+                    if(relMs<100){ //main clock logic
+                        jTextField7.setText("0"+Integer.toString(relMs/10));
+                    }else{
+                        jTextField7.setText(Integer.toString(relMs/10));
+                    }
+                    if(relSec<10){
+                        jTextField8.setText("0"+Integer.toString(relSec));
+                    }else{
+                        jTextField8.setText(Integer.toString(relSec));
+                    }
+                    if(relMin<10){
+                        jTextField6.setText("0"+Integer.toString(relMin));
+                    }else{
+                        jTextField6.setText(Integer.toString(relMin));
+                    }      
+                    relative = 0;
+                }
                 
                 if(lFinish==1){    //left car reaches the end;
                     lMin = min;
@@ -349,6 +421,11 @@ public class GameStats extends javax.swing.JFrame {
         jTextField14.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         jTextField14.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField14.setText("LAP");
+        jTextField14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField14ActionPerformed(evt);
+            }
+        });
 
         jTextField15.setEditable(false);
         jTextField15.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
@@ -479,6 +556,10 @@ public class GameStats extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jTextField14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField14ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField14ActionPerformed
 
     /**
      * @param args the command line arguments
