@@ -137,30 +137,30 @@ public class PiNet {
 
                 System.out.println(text);
 
-                if (document.getRootElement().getName().equals("syncData")) {
+                if (document.getRootElement().getName().equals("data")) {
                     List data;
-                    data = document.selectNodes("/syncData/*");
+                    data = document.selectNodes("/data/*");
                     Iterator<Element> iterator = data.iterator();
                     while (iterator.hasNext()) {
                         Element current = iterator.next();
                         if (current.getName().equals("RaceInfo")) {
-                            raceInfo.time = Integer.parseInt(document.selectSingleNode("/syncData/RaceInfo/Time").getText());
-                            raceInfo.laps = Integer.parseInt(document.selectSingleNode("/syncData/RaceInfo/Laps").getText());
-                            raceInfo.joinedPlayers = Integer.parseInt(document.selectSingleNode("/syncData/RaceInfo/JoinedPlayers").getText());                            
+                            raceInfo.time = Integer.parseInt(document.selectSingleNode("/data/RaceInfo/Time").getText());
+                            raceInfo.laps = Integer.parseInt(document.selectSingleNode("/data/RaceInfo/Laps").getText());
+                            raceInfo.joinedPlayers = Integer.parseInt(document.selectSingleNode("/data/RaceInfo/JoinedPlayers").getText());                            
                         }else if(current.getName().equals("PlayerInfo1")) {
-                            playerInfo1.currentLap = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo1/CurrentLap").getText());
-                            playerInfo1.relativeTime = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo1/RelativeTime").getText());
-                            playerInfo1.speed = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo1/Dpeed").getText());
-                            playerInfo1.turn = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo1/Turn").getText());
-                            playerInfo1.position = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo1/Position").getText());
-                            playerInfo1.flag = Integer.parseInt(document.selectSingleNode("/syncData/PlaerInfo1/Flag").getText());
+                            playerInfo1.currentLap = Integer.parseInt(document.selectSingleNode("/data/PlayerInfo1/CurrentLap").getText());
+                            playerInfo1.relativeTime = Integer.parseInt(document.selectSingleNode("/data/PlayerInfo1/RelativeTime").getText());
+                            playerInfo1.speed = Integer.parseInt(document.selectSingleNode("/data/PlayerInfo1/Dpeed").getText());
+                            playerInfo1.turn = Integer.parseInt(document.selectSingleNode("/data/PlayerInfo1/Turn").getText());
+                            playerInfo1.position = Integer.parseInt(document.selectSingleNode("/data/PlayerInfo1/Position").getText());
+                            playerInfo1.finished = Integer.parseInt(document.selectSingleNode("/data/PlaerInfo1/Finished").getText());
                         } else if(current.getName().equals("PlayerInfo2")) {                          
-                            playerInfo2.currentLap = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo2/CurrentLap").getText());
-                            playerInfo2.relativeTime = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo2/RelativeTime").getText());
-                            playerInfo2.speed = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo2/Dpeed").getText());
-                            playerInfo2.turn = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo2/Turn").getText());
-                            playerInfo2.position = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo2/Position").getText());
-                            playerInfo2.flag = Integer.parseInt(document.selectSingleNode("/syncData/PlaerInfo2/Flag").getText());
+                            playerInfo2.currentLap = Integer.parseInt(document.selectSingleNode("/data/PlayerInfo2/CurrentLap").getText());
+                            playerInfo2.relativeTime = Integer.parseInt(document.selectSingleNode("/data/PlayerInfo2/RelativeTime").getText());
+                            playerInfo2.speed = Integer.parseInt(document.selectSingleNode("/data/PlayerInfo2/Dpeed").getText());
+                            playerInfo2.turn = Integer.parseInt(document.selectSingleNode("/data/PlayerInfo2/Turn").getText());
+                            playerInfo2.position = Integer.parseInt(document.selectSingleNode("/data/PlayerInfo2/Position").getText());
+                            playerInfo2.finished = Integer.parseInt(document.selectSingleNode("/data/PlaerInfo2/Finished").getText());
                         }
                     }
                 }

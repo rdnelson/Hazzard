@@ -24,18 +24,19 @@ public class GameStats extends javax.swing.JFrame {
     /**
      * Creates new form GameStats
      */
-    boolean rFinish = false,lFinish = false;      //finish signal
-    int arrive = 0;     //number of cars finished
-    boolean rLeft = false, rStraight = true, rRight = false;    //direction signal for right car
-    boolean lLeft = false, lStraight = true, lRight = false;    //direction signal for left car
+    int rFinish = 0, lFinish = 0;      //finish signal
+    int lDirection = 0, rDirection = 0;
     int min = 0, sec = 0, ms = 0;       //clock
-    String mode;    //difficulty level
-    boolean rReady = false, lReady = false, start = false;     //inital status
+    boolean start = false;     //inital status
     int countDown = 300;
     int lMin = 99, lSec = 99, lMs = 999;
     int rMin = 99, rSec = 99, rMs = 999;
     double vl = 0, vr = 0;
     int llap = 0, rlap = 0;
+    RaceInfo raceInfo;
+    PlayerInfo playerInfo1;
+    PlayerInfo playerInfo2;
+    PiNet piNet = new PiNet();
     
     public GameStats() {
         initComponents();
@@ -85,17 +86,28 @@ public class GameStats extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //long startTime=System.currentTimeMillis();
-
+                raceInfo = (RaceInfo) piNet.getData("RaceInfo");
+                playerInfo1 = (PlayerInfo) piNet.getData("PlayerInfo1");
+                playerInfo2 = (PlayerInfo) piNet.getData("PlayerInfo2");
                 
-                if(lFinish){    //left car reaches the end
-                    lFinish = false;
+                llap = playerInfo1.currentLap;
+                vl = playerInfo1.speed;
+                lDirection = playerInfo1.turn;
+                lFinish = playerInfo1.finished;
+                
+                rlap = playerInfo2.currentLap;
+                vr = playerInfo2.speed;
+                rDirection = playerInfo2.turn;
+                rFinish = playerInfo2.finished;
+                
+                if(lFinish==1){    //left car reaches the end;
                     lMin = min;
                     lSec = sec;
                     lMs = ms;
                     jTextField7.setText(jTextField1.getText()); 
                     jTextField8.setText(jTextField3.getText());
                     jTextField6.setText(jTextField2.getText());
-                    if(arrive == 0){
+                    if(rFinish!=1){
                         jTextField7.setBackground(green);
                         jTextField8.setBackground(green);
                         jTextField6.setBackground(green);
@@ -104,16 +116,14 @@ public class GameStats extends javax.swing.JFrame {
                         jTextField8.setBackground(red);
                         jTextField6.setBackground(red);                        
                     }
-                    arrive++;
-                }else if(rFinish){  //right car reaches the end
-                    rFinish = false;
+                }else if(rFinish==1){  //right car reaches the end
                     rMin = min;
                     rSec = sec;
                     rMs = ms;
                     jTextField10.setText(jTextField1.getText());
                     jTextField11.setText(jTextField3.getText());
                     jTextField9.setText(jTextField2.getText());
-                    if(arrive == 0){
+                    if(lFinish!=1){
                         jTextField10.setBackground(green);
                         jTextField11.setBackground(green);
                         jTextField9.setBackground(green);
@@ -122,63 +132,59 @@ public class GameStats extends javax.swing.JFrame {
                         jTextField11.setBackground(red);
                         jTextField9.setBackground(red);                        
                     }
-                    arrive++;
                 }
                 
-                jTextField4.setText(String.format("%.2f", vl)); //refresh speed of left car
-                jTextField5.setText(String.format("%.2f", vr)); //refresh speed of right car
+                jTextField4.setText(String.format("%d", vl)); //refresh speed of left car
+                jTextField5.setText(String.format("%d", vr)); //refresh speed of right car
                 
-                if(lLeft){  //direction detector
+                if(lDirection==-1){  //direction detector
                     jLabel5.setVisible(true);
                 }else{
                     jLabel5.setVisible(false);
                 }
-                if(lStraight){
+                if(lDirection==0){
                     jLabel7.setVisible(true);
                 }else{
                     jLabel7.setVisible(false);
                 }
-                if(lRight){
+                if(lDirection==1){
                     jLabel6.setVisible(true);
                 }else{
                     jLabel6.setVisible(false);
                 }
-                if(rLeft){
+                if(rDirection==-1){
                     jLabel9.setVisible(true);
                 }else{
                     jLabel9.setVisible(false);
                 }
-                if(rStraight){
+                if(rDirection==0){
                     jLabel8.setVisible(true);
                 }else{
                     jLabel8.setVisible(false);
                 }
-                if(rRight){
+                if(rDirection==-1){
                     jLabel10.setVisible(true);
                 }else{
                     jLabel10.setVisible(false);
                 }
                 
-                if(rReady&&lReady&&!start){ //countDown for start
-                    if(countDown>150){
-                        jTextField1.setBackground(red);
-                        jTextField3.setBackground(red);
-                        jTextField2.setBackground(red); 
-                    }else if(countDown>0){
-                        jTextField1.setBackground(yellow);
-                        jTextField3.setBackground(yellow);
-                        jTextField2.setBackground(yellow);
-                    }else{
-                        start=true; //start the game $$$send signal
-                        jTextField1.setBackground(green);
-                        jTextField3.setBackground(green);
-                        jTextField2.setBackground(green);                        
-                    }
-                    countDown--;
+                if(raceInfo.time<=-1500){
+                    jTextField1.setBackground(red);
+                    jTextField3.setBackground(red);
+                    jTextField2.setBackground(red); 
+                }else if(raceInfo.time<0){
+                    jTextField1.setBackground(yellow);
+                    jTextField3.setBackground(yellow);
+                    jTextField2.setBackground(yellow);
+                }else{
+                    start=true;
+                    jTextField1.setBackground(green);
+                    jTextField3.setBackground(green);
+                    jTextField2.setBackground(green);                        
                 }
                 
-                if(arrive==2){
-
+                if((lFinish==1)&&(rFinish==1)){
+                    new Result(lMin, lSec, lMs, rMin, rSec, rMs).setVisible(true);
                 }
                 
                 if(start){
@@ -188,24 +194,11 @@ public class GameStats extends javax.swing.JFrame {
                 //System.out.printf("Running time :"+ (endTime-startTime)+"ms\n");
             }
         };
-        //String time = time();
-        //System.out.printf(time);
-            Timer timer = new Timer(100, update);
-            timer.setRepeats(true);
-            timer.start();
+
+        Timer timer = new Timer(100, update);
+        timer.setRepeats(true);
+        timer.start();
         
-    }
-    
-    public GameStats(int i) {   //receive difficulty level from Start.java
-        this();
-        if(i==1){
-            mode = "Easy";
-        }else if(i==2){
-            mode = "Medium";
-        }else{
-            mode = "Legendary";
-        }
-        jLabel15.setText(mode); //print it out
     }
 
     /**
@@ -242,7 +235,6 @@ public class GameStats extends javax.swing.JFrame {
         jLabel13 = new javax.swing.JLabel();
         jTextField11 = new javax.swing.JTextField();
         jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
         jTextField12 = new javax.swing.JTextField();
         jTextField13 = new javax.swing.JTextField();
         jTextField14 = new javax.swing.JTextField();
@@ -344,9 +336,6 @@ public class GameStats extends javax.swing.JFrame {
         jLabel14.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         jLabel14.setText(":");
 
-        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
-        jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
         jTextField12.setEditable(false);
         jTextField12.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         jTextField12.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -375,14 +364,12 @@ public class GameStats extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(322, Short.MAX_VALUE))
+                .addContainerGap(328, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(40, 40, 40)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -486,9 +473,7 @@ public class GameStats extends javax.swing.JFrame {
                     .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(45, 45, 45)
-                .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(49, 49, 49))
+                .addGap(174, 174, 174))
         );
 
         pack();
@@ -538,7 +523,6 @@ public class GameStats extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

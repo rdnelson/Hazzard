@@ -93,7 +93,7 @@ public class Single extends javax.swing.JFrame {
                 llap = playerInfo1.currentLap;
                 vl = playerInfo1.speed;
                 direction = playerInfo1.turn;
-                lFinish = playerInfo1.flag;
+                lFinish = playerInfo1.finished;
                 
                 if(raceInfo.time<=-1500){
                     jTextField1.setBackground(red);

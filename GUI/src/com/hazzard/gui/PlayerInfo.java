@@ -12,11 +12,10 @@ package com.hazzard.gui;
  */
 public class PlayerInfo {
     
-    public int playerNumber = -1;
     public int currentLap = -1;
     public int relativeTime = -1;
     public int speed = -1;
     public int turn = 0;
     public int position = -1;
-    public int flag = -1;
+    public int finished = -1;
 }
