@@ -211,7 +211,7 @@ def ControllerEvent(player, event, data):
             speed = Players.MIN_SPEED
 
         player_infos[player].Speed = speed * 100.0 / (MAX_SPEED * DEFAULT_SPEED_PERCENT)
-        sender.sendUpdate(player_infos[player], "PlayerInfo")
+        sender.sendUpdate(player_infos[player], "PlayerInfo" + str(player_infos[player].Number)
 
         if (DEBUG):
             print "Player: %d, Speed=%d, Turn=%d" % (player, speed, players[player].turn)
@@ -282,7 +282,7 @@ def GateEvent(player):
     # Update each player
     for p in range(Players.MAX_PLAYERS):
         player_infos[p].Position = positions.index(p)
-        sender.sendUpdate(player_infos[p], "PlayerInfo")
+        sender.sendUpdate(player_infos[p], "PlayerInfo" + str(player_infos[player].Number)
 
 
 #Validate the powerups schema
