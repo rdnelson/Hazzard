@@ -30,9 +30,12 @@ public class Start extends javax.swing.JFrame {
     PiNet piNet = new PiNet();
     RaceInfo raceInfo;
     
-    public Start() throws IOException {
+    public Start() {
         initComponents(); 
-        piNet.initialize();
+        try {
+            piNet.initialize();
+        } catch (IOException e) {
+        }
         ActionListener update;  //ActionListener
         update = new ActionListener() {
             @Override
@@ -45,7 +48,7 @@ public class Start extends javax.swing.JFrame {
                     jTextField1.setVisible(false);
                 }
                 
-                if(raceInfo.time==-3){
+                if(raceInfo.time==-3000 && !start){
                     if(raceInfo.joinedPlayers == 2){
                         new GameStats().setVisible(true);
                         start = true;
@@ -172,11 +175,7 @@ public class Start extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                try {
                     new Start().setVisible(true);
-                } catch (IOException ex) {
-                    Logger.getLogger(Start.class.getName()).log(Level.SEVERE, null, ex);
-                }
             }
             
             
