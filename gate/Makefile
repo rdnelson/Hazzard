@@ -27,7 +27,7 @@
 DEBUG	= -O3
 CC	= gcc
 INCLUDE	= -I/usr/local/include
-CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
+CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe -fPIC
 
 LDFLAGS	= -L/usr/local/lib
 LDLIBS    = -lwiringPi -lwiringPiDev -lpthread -lm
@@ -41,9 +41,9 @@ OBJ	=	$(SRC:.c=.o)
 
 BINS	=	$(SRC:.c=)
 
-gate:	gate.o
+gate.so:	gate.o
 	@echo [link]
-	@$(CC) -o $@ gate.o $(LDFLAGS) $(LDLIBS)
+	@$(CC) -shared -o $@ gate.o $(LDFLAGS) $(LDLIBS)
 
 clean:
 	@echo "[Clean]"
