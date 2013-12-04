@@ -1,3 +1,5 @@
+package com.hazzard.gui;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -63,6 +65,7 @@ public class Record extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Hazzard");
         setResizable(false);
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
@@ -71,6 +74,7 @@ public class Record extends javax.swing.JFrame {
         jTextField5.setEditable(false);
         jTextField5.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         jTextField5.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField5.setToolTipText("");
 
         jTextField6.setEditable(false);
         jTextField6.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
@@ -85,12 +89,14 @@ public class Record extends javax.swing.JFrame {
 
         jTextField1.setEditable(false);
         jTextField1.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField1.setText("HAZZARD");
         jTextField1.setBorder(null);
 
         jTextField2.setEditable(false);
         jTextField2.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
-        jTextField2.setText("BEST RECORD");
+        jTextField2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField2.setText("RECORD");
         jTextField2.setBorder(null);
 
         jButton2.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
@@ -134,10 +140,8 @@ public class Record extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(482, 482, 482)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(54, 54, 54)))
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(

@@ -1,3 +1,5 @@
+package com.hazzard.gui;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -126,6 +128,7 @@ public class Result extends javax.swing.JFrame {
         jTextField4 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Hazzard");
         setResizable(false);
 
         jTextField6.setEditable(false);

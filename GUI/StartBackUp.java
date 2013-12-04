@@ -13,17 +13,15 @@ public class Start extends javax.swing.JFrame {
     /**
      * Creates new form Start
      */
-    int gameMode;
-    
     public Start() {
-        initComponents();        
+        initComponents();
         jButton1.setVisible(true);
         jButton2.setVisible(true);
-        jButton3.setVisible(false);
-        jButton4.setVisible(false);
+        jButton3.setVisible(true);
+        jButton4.setVisible(true);
         jButton5.setVisible(false);
         jButton6.setVisible(false);
-        jButton7.setVisible(true);
+        jButton7.setVisible(false);
     }
 
     /**
@@ -168,79 +166,10 @@ public class Start extends javax.swing.JFrame {
 				.addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE)
 				.addContainerGap(0, 0))
         );
-		
+
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-	
-	private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-        // TODO add your handling code here:
-        jButton2.setVisible(false);
-        jButton3.setVisible(true);
-        jButton4.setVisible(true);
-        jButton5.setVisible(true);
-        jButton6.setVisible(true);
-        gameMode = 1;
-    }//GEN-LAST:event_jButton1MouseClicked
-
-    private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
-        // TODO add your handling code here:
-        jButton1.setVisible(false);
-        jButton3.setVisible(true);
-        jButton4.setVisible(true);
-        jButton5.setVisible(true);
-        jButton6.setVisible(true);
-        gameMode = 2;
-    }//GEN-LAST:event_jButton2MouseClicked
-
-    private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
-        // TODO add your handling code here:
-        jButton1.setVisible(true);
-        jButton2.setVisible(true);
-        jButton3.setVisible(false);
-        jButton4.setVisible(false);
-        jButton5.setVisible(false);
-        jButton6.setVisible(false);
-    }//GEN-LAST:event_jButton3MouseClicked
-
-    private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MouseClicked
-        // TODO add your handling code here:
-        if(gameMode==2){
-            new GameStats(1).setVisible(true);
-            this.setVisible(false);
-        }else{
-            new Single(1).setVisible(true);
-            this.setVisible(false);
-        }
-    }//GEN-LAST:event_jButton4MouseClicked
-
-    private void jButton5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton5MouseClicked
-        // TODO add your handling code here:
-        if(gameMode==2){
-            new GameStats(2).setVisible(true);
-            this.setVisible(false);
-        }else{
-            new Single(2).setVisible(true);
-            this.setVisible(false);
-        }
-    }//GEN-LAST:event_jButton5MouseClicked
-
-    private void jButton6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton6MouseClicked
-        // TODO add your handling code here:
-        if(gameMode==2){
-            new GameStats(3).setVisible(true);
-            this.setVisible(false);
-        }else{
-            new Single(3).setVisible(true);
-            this.setVisible(false);
-        }
-    }//GEN-LAST:event_jButton6MouseClicked
-
-    private void jButton7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton7MouseClicked
-        // TODO add your handling code here:
-        System.exit(0);
-    }//GEN-LAST:event_jButton7MouseClicked
-
 
     /**
      * @param args the command line arguments
@@ -271,7 +200,6 @@ public class Start extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
             public void run() {
                 new Start().setVisible(true);
             }
