@@ -43,7 +43,7 @@ BINS	=	$(SRC:.c=)
 
 gate:	gate.o
 	@echo [link]
-	@$(CC) -o $@ isr.o $(LDFLAGS) $(LDLIBS)
+	@$(CC) -o $@ gate.o $(LDFLAGS) $(LDLIBS)
 
 clean:
 	@echo "[Clean]"
