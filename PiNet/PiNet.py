@@ -105,6 +105,9 @@ class Receiver:
 		self.thread.daemon = True
 		self.thread.start()
 
+	def close(self):
+		self.sock_receive.close()
+
 	def __setPort(self, port):
 		if self.debug: print 'Setting receive port to ', port
 		self.SERVER_ADDRESS = ('', port)
@@ -136,8 +139,11 @@ class Receiver:
 		return getattr(self.__data, whatData)
 
 	def hibernate(self):
-		while True:
-			self.thread.join(1)
+		try:
+			while True:
+				self.thread.join(1)
+		except(KeyboardInterrupt):
+			print "Waking from Hibernation"
 
 	def parse(self, text):
 		if self.debug: print 'Parsing'
