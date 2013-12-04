@@ -54,6 +54,21 @@ public class GameStats extends javax.swing.JFrame {
                             if(sec==60){
                                 sec=0;
                                 min++;
+                            }
+                            if(ms<100){ //main clock logic
+                                jTextField2.setText("0"+Integer.toString(ms/10));
+                            }else{
+                                jTextField2.setText(Integer.toString(ms/10));
+                            }
+                            if(sec<10){
+                                jTextField3.setText("0"+Integer.toString(sec));
+                            }else{
+                                jTextField3.setText(Integer.toString(sec));
+                            }
+                            if(min<10){
+                                jTextField1.setText("0"+Integer.toString(min));
+                            }else{
+                                jTextField1.setText(Integer.toString(min));
                             }    
                         }
                     }catch(Exception e){
@@ -70,21 +85,7 @@ public class GameStats extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //long startTime=System.currentTimeMillis();
-                if(ms<100){ //main clock logic
-                    jTextField2.setText("0"+Integer.toString(ms/10));
-                }else{
-                    jTextField2.setText(Integer.toString(ms/10));
-                }
-                if(sec<10){
-                    jTextField3.setText("0"+Integer.toString(sec));
-                }else{
-                    jTextField3.setText(Integer.toString(sec));
-                }
-                if(min<10){
-                    jTextField1.setText("0"+Integer.toString(min));
-                }else{
-                    jTextField1.setText(Integer.toString(min));
-                }
+
                 
                 if(lFinish){    //left car reaches the end
                     lFinish = false;
@@ -181,17 +182,7 @@ public class GameStats extends javax.swing.JFrame {
                 }
                 
                 if(start){
-/*                  if(sec==9&&ms==9){lFinish=true;}
-                    if(sec==2&&ms==2){lLeft=true; lStraight= false; lRight=false;}
-                    if(sec==4&&ms==4){lLeft=false; lStraight= false; lRight=true;}
-                    if(sec==7&&ms==7){lLeft=false; lStraight= true; lRight=false;}
-                    if(sec<9){vl+=0.02;}else{vl=0;}
-                    if(sec==11&&ms==473){rFinish=true;}  
-                    if(sec==4&&ms==4){rLeft=true; rStraight= false; rRight=false;}
-                    if(sec==6&&ms==6){rLeft=false; rStraight= false; rRight=true;}
-                    if(sec==9&&ms==9){rLeft=false; rStraight= true; rRight=false;}
-                    if(sec<11){vr+=0.01;}else{vr=0;}
-*/
+                    
                 }
                 //long endTime=System.currentTimeMillis();
                 //System.out.printf("Running time :"+ (endTime-startTime)+"ms\n");
@@ -199,7 +190,7 @@ public class GameStats extends javax.swing.JFrame {
         };
         //String time = time();
         //System.out.printf(time);
-            Timer timer = new Timer(1, update);
+            Timer timer = new Timer(100, update);
             timer.setRepeats(true);
             timer.start();
         
@@ -536,30 +527,6 @@ public class GameStats extends javax.swing.JFrame {
             @Override
             public void run() {
                 new GameStats().setVisible(true);
-            }
-            
-            public void parse(String text)
-                    throws DocumentException {
-                Document document = DocumentHelper.parseText(text.trim());
-
-                System.out.println(text);
-
-                if (document.getRootElement().getName().equals("data")) {
-                    List data;
-                    data = document.selectNodes("/data/*");
-                    Iterator<Element> iterator = data.iterator();
-                    while (iterator.hasNext()) {
-                        Element current = iterator.next();
-                        if (current.getName().equals("playerInfo")) {
-                            playerInfo.currentLap = Integer.parseInt(document.selectSingleNode("/data/playerInfo/currentLap").getText());
-                            playerInfo.relativeTime = Integer.parseInt(document.selectSingleNode("/data/playerInfo/relativeTime").getText());
-                            playerInfo.speed = Integer.parseInt(document.selectSingleNode("/data/playerInfo/speed").getText());
-                            playerInfo.turn = Integer.parseInt(document.selectSingleNode("/data/playerInfo/turn").getText());
-                            playerInfo.position = Integer.parseInt(document.selectSingleNode("/data/playerInfo/position").getText());
-                            playerInfo.flag = Integer.parseInt(document.selectSignleNode("/data/plaerInfo/flag").getText());
-                        }
-                    }
-                }
             }
         });
     }

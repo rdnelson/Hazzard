@@ -4,6 +4,9 @@ package com.hazzard.gui;
 import static java.awt.Color.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Timer;
 
 /*
@@ -30,9 +33,17 @@ public class Single extends javax.swing.JFrame {
     int minRecord = 99, secRecord = 99, msRecord = 999;
     double vl = 0;
     int llap = 0;
+    RaceInfo raceInfo;
+    PlayerInfo playerInfo1, playerInfo2;
+    PiNet piNet = new PiNet();
     
-    public Single() {
+    public Single(){
         initComponents();
+        try {
+            piNet.initialize();
+        } catch (IOException ex) {
+            Logger.getLogger(Single.class.getName()).log(Level.SEVERE, null, ex);
+        }
         class Clock extends Thread{ //clock
             @Override
             public void run(){
@@ -48,14 +59,29 @@ public class Single extends javax.swing.JFrame {
                             if(sec==60){
                                 sec=0;
                                 min++;
-                            }    
+                            }
+                            if(ms<100){ //main clock logic
+                                jTextField2.setText("0"+Integer.toString(ms/10));
+                            }else{
+                                jTextField2.setText(Integer.toString(ms/10));
+                            }
+                            if(sec<10){
+                                jTextField3.setText("0"+Integer.toString(sec));
+                            }else{
+                                jTextField3.setText(Integer.toString(sec));
+                            }
+                            if(min<10){
+                                jTextField1.setText("0"+Integer.toString(min));
+                            }else{
+                                jTextField1.setText(Integer.toString(min));
+                            }
                         }
                     }catch(Exception e){
                         System.out.println(e);
                     }                    
                 }
             }
-        }
+        } 
         Clock t = new Clock();
         t.start();
         
@@ -63,22 +89,9 @@ public class Single extends javax.swing.JFrame {
         update = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(ms<100){ //main clock logic
-                    jTextField2.setText("0"+Integer.toString(ms/10));
-                }else{
-                    jTextField2.setText(Integer.toString(ms/10));
-                }
-                if(sec<10){
-                    jTextField3.setText("0"+Integer.toString(sec));
-                }else{
-                    jTextField3.setText(Integer.toString(sec));
-                }
-                if(min<10){
-                    jTextField1.setText("0"+Integer.toString(min));
-                }else{
-                    jTextField1.setText(Integer.toString(min));
-                }
-                
+                raceInfo = (RaceInfo) piNet.getData("RaceInfo");
+                playerInfo1 = (PlayerInfo) piNet.getData("PlayerInfo1");
+                playerInfo2 = (PlayerInfo) piNet.getData("PlayerInfo2");
                 if(lFinish){    //left car reaches the end
                     lFinish = false;
                     jTextField5.setText(jTextField1.getText()); 
@@ -141,16 +154,11 @@ public class Single extends javax.swing.JFrame {
                 }
                 
                 if(start){
-/*                  if(sec==9){lFinish=true;}
-                    if(sec==2){lLeft=true; lStraight= false; lRight=false;}
-                    if(sec==4){lLeft=false; lStraight= false; lRight=true;}
-                    if(sec==7){lLeft=false; lStraight= true; lRight=false;}
-                    if(sec<3){vl+=0.02;}else{vl=0;}       
-*/
+    
                 }
             }
         };
-        Timer timer = new Timer(1, update);
+        Timer timer = new Timer(100, update);
         timer.setRepeats(true);
         timer.start();        
     }

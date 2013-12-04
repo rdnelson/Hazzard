@@ -12,6 +12,7 @@ package com.hazzard.gui;
  */
 public class PlayerInfo {
     
+    public int playerNumber = -1;
     public int currentLap = -1;
     public int relativeTime = -1;
     public int speed = -1;

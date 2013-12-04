@@ -6,6 +6,9 @@ import static java.awt.Color.red;
 import static java.awt.Color.yellow;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Timer;
 
 /*
@@ -24,13 +27,17 @@ public class Start extends javax.swing.JFrame {
      * Creates new form Start
      */
     boolean start = false;
+    PiNet piNet = new PiNet();
+    RaceInfo raceInfo;
     
-    public Start() {
-        initComponents();        
+    public Start() throws IOException {
+        initComponents(); 
+        piNet.initialize();
         ActionListener update;  //ActionListener
         update = new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {             
+                raceInfo = (RaceInfo) piNet.getData("RaceInfo");
                 if(raceInfo.joinedPlayers == 1){
                     jTextField1.setVisible(true);
                 }else if(raceInfo.joinedPlayers == 2){
@@ -52,11 +59,11 @@ public class Start extends javax.swing.JFrame {
         if(start){
             this.setVisible(false);
         }
-        Timer timer = new Timer(1, update);
+        Timer timer = new Timer(100, update);
         timer.setRepeats(true);
         timer.start();
-    }
-    
+    }   
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -165,7 +172,11 @@ public class Start extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new Start().setVisible(true);
+                try {
+                    new Start().setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(Start.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             
             
