@@ -12,10 +12,10 @@ clean:
 	$(RM) $(APPOBJ) $(LIBOBJ) xbox_test xbox.so
 
 xbox_test: $(APPOBJ)
-	$(CPP) -g -o $@ $^
+	$(CPP) -g -pthread -o $@ $^
 
 xbox.so: $(LIBOBJ)
-	$(CPP) -g -shared -fPIC -o $@ $^
+	$(CPP) -g -shared -fPIC -pthread -o $@ $^
 
 %.o: %.c
 	$(CPP) -c -g -o $@ $^

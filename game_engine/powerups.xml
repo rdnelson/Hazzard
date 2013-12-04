@@ -1,0 +1,59 @@
+<powerups>
+    <powerup name="Mushroom">
+        <effect>
+            <positionRel>0</positionRel>
+            <maxSpeed>0.25</maxSpeed>
+            <duration>5</duration>
+        </effect>
+    </powerup>
+    <powerup name="Star">
+        <effect>
+            <positionRel>0</positionRel>
+            <maxSpeed>10</maxSpeed>
+            <immortal>1</immortal>
+            <duration>5.0</duration>
+        </effect>
+    </powerup>
+    <powerup name="Red Shell">
+        <effect>
+            <positionRel>1</positionRel>
+            <maxSpeed>-10</maxSpeed>
+            <duration>1.0</duration>
+            <delay>1.0</delay>
+            <hitChance>0.95</hitChance>
+        </effect>
+    </powerup>
+    <powerup name="Green Shell">
+        <effect>
+            <positionRel>1</positionRel>
+            <maxSpeed>-10</maxSpeed>
+            <duration>1.0</duration>
+            <delay>1.0</delay>
+            <hitChance>0.5</hitChance>
+        </effect>
+    </powerup>
+    <powerup name="Banana">
+        <effect>
+            <positionRel>-1</positionRel>
+            <maxSpeed>-0.65</maxSpeed>
+            <duration>1.0</duration>
+            <hitChance>0.5</hitChance>
+        </effect>
+    </powerup>
+    <powerup name="Blue Shell">
+        <effect>
+            <positionAbs>1</positionAbs>
+            <maxSpeed>-10</maxSpeed>
+            <duration>1.5</duration>
+            <delay>1.0</delay>
+        </effect>
+    </powerup>
+    <powerup name="Lightning">
+        <effect>
+            <positionRel>0</positionRel>
+            <invertSel/>
+            <maxSpeed>-0.25</maxSpeed>
+            <duration>5</duration>
+        </effect>
+    </powerup>
+</powerups>

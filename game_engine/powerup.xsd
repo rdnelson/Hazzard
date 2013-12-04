@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="powerups">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="powerup" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="effect">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:choice>
+                                            <xs:element name="positionAbs" type="xs:integer"/>
+                                            <xs:element name="positionRel" type="xs:integer"/>
+                                        </xs:choice>
+                                        <xs:element name="invertSel" minOccurs="0"/>
+                                        <xs:choice minOccurs="1" maxOccurs="3">
+                                            <xs:element name="maxSpeed" type="xs:decimal" maxOccurs="1"/>
+                                            <xs:element name="turn" type="xs:string" maxOccurs="1"/>
+                                            <xs:element name="immortal" type="xs:boolean" maxOccurs="1"/>
+                                        </xs:choice>
+                                        <xs:element name="duration" type="xs:decimal"/>
+                                        <xs:element name="delay" type="xs:decimal" minOccurs="0"/>
+                                        <xs:element name="hitChance" type="xs:decimal" minOccurs="0"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="name" type="xs:string" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
