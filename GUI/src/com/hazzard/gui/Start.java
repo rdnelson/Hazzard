@@ -23,18 +23,38 @@ public class Start extends javax.swing.JFrame {
     /**
      * Creates new form Start
      */
-    int gameMode;
-    boolean trigger = false;    //Enter Button
-    boolean up = false;
-    boolean down = false;
-    boolean left = false;
-    boolean right = false;
-    int selectMode;
-    boolean finish = false;
+    boolean start = false;
     
     public Start() {
         initComponents();        
-        
+        ActionListener update;  //ActionListener
+        update = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(raceInfo.joinedPlayers == 1){
+                    jTextField1.setVisible(true);
+                }else if(raceInfo.joinedPlayers == 2){
+                    jTextField2.setVisible(true);
+                    jTextField1.setVisible(false);
+                }
+                
+                if(raceInfo.time==-3){
+                    if(raceInfo.joinedPlayers == 2){
+                        new GameStats().setVisible(true);
+                        start = true;
+                    }else if(raceInfo.joinedPlayers == 1){
+                        new Single().setVisible(true);
+                        start = true;
+                    }
+                }
+            }
+        };
+        if(start){
+            this.setVisible(false);
+        }
+        Timer timer = new Timer(1, update);
+        timer.setRepeats(true);
+        timer.start();
     }
     
     /**
