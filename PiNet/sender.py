@@ -1,4 +1,4 @@
-from PiNet import *
+from PiNetJython import *
 
 class SongData(Data):
 	volume = 8 #DOES NOT WORK, only variables are sent, not attributes

@@ -5,9 +5,9 @@ import xml.etree.ElementTree
 import time
 
 class TestReceiver(unittest.TestCase):
-	def callback(self, testArg=None, testArg1=None, testArg2=None):
-		if testArg is not None: self.testText = testArg
-		elif testArg2 is None: self.testText = "Simple callback"
+	def callback(self, testArg1=None, testArg2=None):
+		if testArg1 is None: self.testText = "Simple callback"
+		elif testArg2 is None: self.testText = testArg1
 		else: self.testText = testArg1 + testArg2
 		
 	def setUp(self):
@@ -37,8 +37,8 @@ class TestReceiver(unittest.TestCase):
 		
 		self.receiver.clearCallbacks()
 		
-		self.assertFalse(self.receiver.removeCallback("Test1"))
-		self.assertFalse(self.receiver.removeCallback("Test2"))
+		self.assertFalse(self.receiver.callbacks.has_key("Test1"))
+		self.assertFalse(self.receiver.callbacks.has_key("Test2"))
 
 	def test_parse_syncdata_simple(self):
 		testData = "test!"
@@ -67,11 +67,11 @@ class TestReceiver(unittest.TestCase):
 		self.assertEquals(self.testText, "Simple callback")
 		
 	def test_parse_asyncdata_1kwarg(self):
-		testArg = "testArg data"
+		testArg1 = "testArg data"
 		self.receiver.addCallback("test", self.callback)
-		self.receiver.parse("<asyncData><test testArg='" + testArg + "'></test></asyncData>")
+		self.receiver.parse("<asyncData><test testArg1='" + testArg1 + "'></test></asyncData>")
 		
-		self.assertEquals(self.testText, testArg)
+		self.assertEquals(self.testText, testArg1)
 		
 	def test_parse_asyncdata_2kwargs(self):
 		testArg1 = "testArg1 data"
@@ -82,7 +82,7 @@ class TestReceiver(unittest.TestCase):
 		self.assertEquals(self.testText, testArg1 + testArg2)
 		
 	def test_parse_asyncdata_int(self):
-		testArg = 1
+		testArg1 = 1
 		self.receiver.addCallback("test", self.callback)
 		self.assertRaises(xml.etree.ElementTree.ParseError, self.receiver.parse, ("<asyncData><test testArg=" + str(testArg) + "></test></asyncData>"))
 	

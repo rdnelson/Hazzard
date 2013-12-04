@@ -1,0 +1,2 @@
+libxerces2-java must be installed for PiNetJython to work, and /usr/share/java/xercesImpl.jar
+must be added to the $CLASSPATH variable
