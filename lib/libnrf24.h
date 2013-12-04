@@ -137,7 +137,11 @@ void nrf_flush_tx();
 
 uint8_t nrf_data_available();
 uint8_t nrf_get_payload_size();
+
 void nrf_set_address(uint8_t tx, uint8_t* pStart);
+void nrf_set_address_suffix(uint8_t suffix);
+
+
 void nrf_send(uint8_t* pStart, uint8_t uSz);
 void nrf_power_radio(nrf_mode_t tx);
 void nrf_receive(uint8_t* pStart, uint8_t len);

@@ -217,4 +217,11 @@ uint8_t nrf_read_status()
     return status;
 }
 
+void nrf_set_address_suffix(uint8_t suffix){
+	set_ce(0);
+    nrf_write_register(RX_ADDR_P0,&suffix,1);
+    nrf_write_register(TX_ADDR,&suffix,1);
+    set_ce(1);
+}
+
 
