@@ -143,9 +143,8 @@ public class Single extends javax.swing.JFrame {
                     jLabel6.setVisible(false);
                 }
                 
-                if(lFinish==1&&start){
+                if((lFinish==1)&&!finish){
                     new Record(lMin, lSec, lMs).setVisible(true);
-                    start = false;
                     finish = true;
                 }
             }

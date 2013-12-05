@@ -5,6 +5,9 @@ package com.hazzard.gui;
 import static java.awt.Color.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Timer;
 
 
@@ -32,7 +35,7 @@ public class GameStats extends javax.swing.JFrame {
     int lMin = 99, lSec = 99, lMs = 999;
     int rMin = 99, rSec = 99, rMs = 999;
     int relMin = 0, relSec = 0, relMs = 0;
-    double vl = 0, vr = 0;
+    int vl = 0, vr = 0;
     int llap = 0, rlap = 0;
     int relative = 0;
     boolean finish = false;
@@ -43,6 +46,11 @@ public class GameStats extends javax.swing.JFrame {
     
     public GameStats() {
         initComponents();
+        try {
+            piNet.initialize();
+        } catch (IOException ex) {
+            Logger.getLogger(Single.class.getName()).log(Level.SEVERE, null, ex);
+        }
         class Clock extends Thread{ //clock
             @Override
             public void run(){
@@ -119,10 +127,10 @@ public class GameStats extends javax.swing.JFrame {
                     jTextField2.setBackground(green);                        
                 }
                 
-                 if(llap<rlap){    //left car reaches the end;
-                    jTextField7.setText("0"); 
-                    jTextField8.setText("0");
-                    jTextField6.setText("0");
+                 if(rlap<llap){    //left car reaches the end;
+                    jTextField7.setText("00"); 
+                    jTextField8.setText("00");
+                    jTextField6.setText("00");
                     jTextField7.setBackground(green);
                     jTextField8.setBackground(green);
                     jTextField6.setBackground(green);
@@ -130,10 +138,10 @@ public class GameStats extends javax.swing.JFrame {
                     jTextField11.setBackground(red);
                     jTextField9.setBackground(red);
                     relative = 1;
-                }else if(rlap<llap){  //right car reaches the end
-                    jTextField10.setText("0"); 
-                    jTextField11.setText("0");
-                    jTextField9.setText("0");
+                }else if(llap<rlap){  //right car reaches the end
+                    jTextField10.setText("00"); 
+                    jTextField11.setText("00");
+                    jTextField9.setText("00");
                     jTextField10.setBackground(green);
                     jTextField11.setBackground(green);
                     jTextField9.setBackground(green);
@@ -256,9 +264,8 @@ public class GameStats extends javax.swing.JFrame {
                     jLabel10.setVisible(false);
                 }
                 
-                if((lFinish==1)&&(rFinish==1)&&start){
+                if((lFinish==1)&&(rFinish==1)&&!finish){
                     new Result(lMin, lSec, lMs, rMin, rSec, rMs).setVisible(true);
-                    start = false;
                     finish = true;
                 }
                 
