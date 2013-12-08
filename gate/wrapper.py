@@ -21,22 +21,18 @@ def LapEvent(carNum):
     global data_ready
     global packet
 
-    print "Event1"
     packets.append(carNum)
     data_ready.release()
-    print "Event2"
 
 def SendThread():
     global data_ready
     global packet
     
     while True:
-        print "Hello"
         data_ready.acquire()
         num = packets.pop()
         sender.sendAsync("LapFinishedEvent", carNum=str(num))
 
-print "test"
 data_ready = threading.Semaphore(0)
 gate_lib = cdll.LoadLibrary("%s/gate.so" % local_dir)
 
