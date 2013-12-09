@@ -74,8 +74,8 @@ def TimeEvent():
     global race_info
 
     # update effect status
-    #for player in players:
-        #Players.handleEffects(player)
+    for player in players:
+        Players.handleEffects(player)
 
     diff = (datetime.now() - start_time)
     race_info.Time = diff.seconds * 1000 + diff.microseconds / 1000
@@ -85,6 +85,7 @@ def TimeEvent():
         timer = Timer(0.1, TimeEvent)
         timer.start()
 
+# Receive controller input
 def ControllerEvent(player, event, data, packet_id):
     global race_info
     global players
@@ -92,6 +93,7 @@ def ControllerEvent(player, event, data, packet_id):
     global player_infos
     packet_id = int(packet_id)
 
+    # did packet arrive in order?
     try:
         if packet_id < last_id:
             print "Discarding packet %d, last_received %d" % (packet_id, last_id)
@@ -216,7 +218,7 @@ def ControllerEvent(player, event, data, packet_id):
         speed2 = players[player].forward - players[player].reverse
 
         #Deal with player effects
-        #Players.handleEffects(player)
+        Players.handleEffects(player)
         players[player].speed_percent = Players.DEFAULT_SPEED_PERCENT
 
         speed2 = int(speed2 * players[player].speed_percent)
@@ -228,6 +230,7 @@ def ControllerEvent(player, event, data, packet_id):
         if (speed2 < Players.MIN_SPEED):
             speed2 = Players.MIN_SPEED
 
+        #update speed info for the GUI
         player_infos[player].Speed = speed * 100.0 / (MAX_SPEED * DEFAULT_SPEED_PERCENT)
         sender.sendUpdate(player_infos[player], "PlayerInfo" + str(player_infos[player].Number))
 
