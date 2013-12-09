@@ -1,5 +1,15 @@
-package PiNet;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 
+package com.hazzard.gui;
+
+/**
+ *
+ * @author Hao
+ */
 import java.net.*;
 import java.io.IOException;
 import org.dom4j.*;
@@ -27,36 +37,22 @@ public class PiNet {
     int ttl;
     // The multicast group
     String group;
-    // Data about the song
-    SongData songData;
 
+    RaceInfo raceInfo;
+    PlayerInfo playerInfo1;
+    PlayerInfo playerInfo2;
+    
     /**
      * PiNet constructor. Initializes constants, allows for extension using
      * different ports, or interface
      */
     public PiNet() {
-        this.songData = new SongData();
+        this.raceInfo = new RaceInfo();
+        this.playerInfo1 = new PlayerInfo();
+        this.playerInfo2 = new PlayerInfo();
         this.port = 9001;
         this.ttl = 1;
         this.group = "224.0.0.1";
-    }
-
-    /**
-     * SongData class. Includes data about the current song, as received from
-     * the synth.
-     */
-    public class SongData {
-
-        public String songName = "";
-        public int volume = -1;
-        public Time time = new Time();
-
-        public class Time {
-
-            public int frame = -1;
-            public int percent = -1;
-            public int second = -1;
-        }
     }
 
     public void initialize()
@@ -78,9 +74,13 @@ public class PiNet {
     }
 
     public Object getData(String whatData) {
-        if (whatData.equals("song")) {
-            return songData;
-        } else {
+        if (whatData.equals("RaceInfo")) {
+            return raceInfo;
+        } else if(whatData.equals("PlayerInfo1")){
+            return playerInfo1;
+        } else if(whatData.equals("PlayerInfo2")){
+            return playerInfo2;
+        }else{
             return null;
         }
     }
@@ -132,25 +132,37 @@ public class PiNet {
     }
 
     public void parse(String text)
-            throws DocumentException {
-        Document document = DocumentHelper.parseText(text.trim());
-        
-        System.out.println(text);
-        
-        if (document.getRootElement().getName().equals("data")) {
-            List data;
-            data = document.selectNodes("/data/*");
-            Iterator<Element> iterator = data.iterator();
-            while (iterator.hasNext()) {
-                Element current = iterator.next();
-                if (current.getName().equals("songData")) {
-                    songData.songName = document.selectSingleNode("/data/songData/songName").getText();
-                    songData.volume = Integer.parseInt(document.selectSingleNode("/data/songData/volume").getText());
-                    songData.time.frame = Integer.parseInt(document.selectSingleNode("/data/songData/time/frame").getText());
-                    songData.time.percent = Integer.parseInt(document.selectSingleNode("/data/songData/time/percent").getText());
-                    songData.time.second = Integer.parseInt(document.selectSingleNode("/data/songData/time/second").getText());
+                    throws DocumentException {
+                Document document = DocumentHelper.parseText(text.trim());
+
+                System.out.println(text);
+
+                if (document.getRootElement().getName().equals("syncData")) {
+                    List data;
+                    data = document.selectNodes("/syncData/*");
+                    Iterator<Element> iterator = data.iterator();
+                    while (iterator.hasNext()) {
+                        Element current = iterator.next();
+                        if (current.getName().equals("RaceInfo")) {
+                            raceInfo.time = Integer.parseInt(document.selectSingleNode("/syncData/RaceInfo/Time").getText());
+                            raceInfo.laps = Integer.parseInt(document.selectSingleNode("/syncData/RaceInfo/Laps").getText());
+                            raceInfo.joinedPlayers = Integer.parseInt(document.selectSingleNode("/syncData/RaceInfo/JoinedPlayers").getText());                            
+                        }else if(current.getName().equals("PlayerInfo1")) {
+                            playerInfo1.currentLap = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo1/CurrentLap").getText());
+                            playerInfo1.relativeTime = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo1/RelativeTime").getText());
+                            playerInfo1.speed = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo1/Speed").getText());
+                            playerInfo1.turn = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo1/Turn").getText());
+                            playerInfo1.position = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo1/Position").getText());
+                            playerInfo1.finished = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo1/Finished").getText());
+                        } else if(current.getName().equals("PlayerInfo2")) {                          
+                            playerInfo2.currentLap = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo2/CurrentLap").getText());
+                            playerInfo2.relativeTime = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo2/RelativeTime").getText());
+                            playerInfo2.speed = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo2/speed").getText());
+                            playerInfo2.turn = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo2/Turn").getText());
+                            playerInfo2.position = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo2/Position").getText());
+                            playerInfo2.finished = Integer.parseInt(document.selectSingleNode("/syncData/PlayerInfo2/Finished").getText());
+                        }
+                    }
                 }
-            }
-        }
     }
 }
