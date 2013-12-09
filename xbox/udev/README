@@ -1,0 +1,10 @@
+The file in this directory is a udev rule to give all users read/write access to xbox
+controller input devices.
+
+This is necessary to allow non-root users access to the devices.
+
+If you choose to use this file to allow the xbox library to be used by non-root users, it should
+be copied into /etc/udev/rules.d/
+
+If that directory doesn't exist, then udev is not installed on your system, and this file will
+be of no use.
