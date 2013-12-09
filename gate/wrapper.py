@@ -17,37 +17,41 @@ sender.debug = True
 #define the input callback type
 c_lap_callback = CFUNCTYPE(None, c_int)
 
+#Callback when we get a lap
 def LapEvent(carNum):
     global data_ready
     global packet
 
     packets.append(carNum)
+    #notify send thread
     data_ready.release()
 
+#Send any data when available
 def SendThread():
     global data_ready
     global packet
     
     while True:
+    	#Wait on data
         data_ready.acquire()
         num = packets.pop()
         sender.sendAsync("LapFinishedEvent", carNum=str(num))
 
 data_ready = threading.Semaphore(0)
+
+#Load the shared library
 gate_lib = cdll.LoadLibrary("%s/gate.so" % local_dir)
 
 if(gate_lib == None):
     print "Error loading Xbox library."
     exit()
     
+#Call the init function with the callback for LapEvent
 gate_lib.init(c_lap_callback(LapEvent))
 
+#Create and start the sender thread
 thread = threading.Thread(None, SendThread)
 thread.setDaemon(True)
 thread.start()
 
-while True:
-    try:
-        time.sleep(0.1)
-    except KeyboardInterrupt:
-        break
+sender.hibernate()
