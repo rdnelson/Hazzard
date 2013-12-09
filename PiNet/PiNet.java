@@ -1,15 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package com.hazzard.gui;
-
-/**
- *
- * @author Hao
- */
 import java.net.*;
 import java.io.IOException;
 import org.dom4j.*;
@@ -26,6 +14,8 @@ import java.util.logging.Logger;
  *
  * @version 10.01.2013
  * @author Darren
+ *
+ * NOTE: This code was written as a last minute workaround to get past Jython. Do not take this code for a final product, even though it "shipped".
  */
 public class PiNet {
 
@@ -55,6 +45,7 @@ public class PiNet {
         this.group = "224.0.0.1";
     }
 
+    //Initialize, creates the sockets, and starts the receiver thread
     public void initialize()
             throws IOException {
         // Configure the socket
@@ -73,6 +64,7 @@ public class PiNet {
         receiver.start();
     }
 
+    //Get either Race info, or the appropriate PlayerInfo
     public Object getData(String whatData) {
         if (whatData.equals("RaceInfo")) {
             return raceInfo;
@@ -84,30 +76,8 @@ public class PiNet {
             return null;
         }
     }
-
-    public void sendCommand(String command, String data)
-            throws Exception {
-        Document document;
-        document = DocumentHelper.createDocument();
-        Element root = document.addElement("commands");
-        Element commandElem = root.addElement("command");
-        commandElem.setText(command);
-
-        commandElem.addAttribute("data", data);
-
-        final Writer writer = new StringWriter();
-        new XMLWriter(writer).write(root);
-        String text = writer.toString().trim();
-
-        DatagramPacket pack = new DatagramPacket(text.getBytes(), text.length(), InetAddress.getByName(group), port);
-        sock_send.send(pack);
-    }
-
-    public void sendCommand(String command)
-            throws Exception {
-        sendCommand(command, "");
-    }
-
+    
+    //Receiver thread, sends data to parse
     private class Receiver extends Thread {
 
         @Override
@@ -131,11 +101,11 @@ public class PiNet {
         }
     }
 
+    //Parses an XML input string. Not enough time to do dynamic class creation
+    //in Java, so everything is hardcoded. I do not like this, not one bit.
     public void parse(String text)
                     throws DocumentException {
                 Document document = DocumentHelper.parseText(text.trim());
-
-                System.out.println(text);
 
                 if (document.getRootElement().getName().equals("syncData")) {
                     List data;
