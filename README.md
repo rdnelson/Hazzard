@@ -2,8 +2,11 @@ Project Hazzard
 ===============
 
 Hao Cheng
+
 Robert Nelson
+
 Darren Stahl
+
 Hasith Vidanamadura
 
 This is a term project for SYSC3010 (F13). The project is to have
