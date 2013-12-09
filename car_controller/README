@@ -1,0 +1,9 @@
+To run the car controller, the nrf library must be built.
+
+Run:
+
+> make -C ../lib/bcm2835/
+
+To build the library. Then, the car controller can be started by running:
+
+> ./car_controller.py

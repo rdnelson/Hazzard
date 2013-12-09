@@ -17,6 +17,8 @@
 #define XBOX_NAME "Xbox"
 #define MAX_PLAYERS 4
 
+// Define macros to handle syscall error logging
+
 #define INPUT(a, r) { \
     if((r = a) == -1) { \
         if(errno != EAGAIN) { \
@@ -115,6 +117,7 @@ int open_controllers() {
     return num_controllers;
 }
 
+// Thread body for callback threads
 void *thread_read(void* void_info) {
     struct callback_info* info = (struct callback_info*)void_info;
 
@@ -123,12 +126,14 @@ void *thread_read(void* void_info) {
     struct player_event retval;
     struct input_event inp;
 
+    // convert controller file to blocking reads
     SYSCALL_THREAD(fcntl(info->fd, F_GETFL, 0), flags);
 
     flags &= ~O_NONBLOCK;
 
     SYSCALL_THREAD(fcntl(info->fd, F_SETFL, flags), flags);
 
+    // Read forever
     while(1) {
         INPUT_THREAD(read(info->fd, &inp, sizeof(inp)), read_ret);
         if(read_ret == sizeof(inp) && inp.type != 0) {
@@ -141,6 +146,7 @@ void *thread_read(void* void_info) {
     }
 }
 
+// Register a callback for the specified controller
 void add_callback(unsigned int player, read_callback callback) {
     if (player >= MAX_PLAYERS)
         return;
@@ -152,6 +158,7 @@ void add_callback(unsigned int player, read_callback callback) {
         info->cb = callback;
         info->player = player;
 
+        // Create the reading thread
         int retval;
         SYSCALL(pthread_create(threads + player, NULL, thread_read, (void*)info), retval);
         player_fds[player] = -2;

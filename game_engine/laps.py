@@ -1,3 +1,4 @@
+# get position of players array
 def getPositions(players):
     player_times = {}
 
@@ -9,6 +10,7 @@ def getPositions(players):
 
     return _getPositions(player_times)
 
+# get positions of player map
 def _getPositions(player_times):
     times = player_times.items()
     times.sort(cmpPlayerLap)

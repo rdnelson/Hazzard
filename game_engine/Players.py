@@ -6,7 +6,7 @@ import datetime
 MAX_PLAYERS = 2
 MAX_SPEED = 255
 MIN_SPEED = -255
-DEFAULT_SPEED_PERCENT = 0.75
+DEFAULT_SPEED_PERCENT = 1
 
 class PlayerState:
     def __init__(self):
@@ -46,6 +46,7 @@ def handleEffects(player):
 
         player.speed_percent = new_speed_percent
 
+# apply effect to appropriate player(s)
 def triggerPowerup(player):
 
     if players[player] == None:
@@ -65,6 +66,7 @@ def triggerPowerup(player):
 
     players[player].powerup == None
 
+# find the players targeted by powerup
 def getTargets(powerup, caller_idx):
 
     retVal = []

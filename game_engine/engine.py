@@ -30,10 +30,10 @@ class PlayerInfo(PiNet.Data):
         self.Speed = 0
         self.Turn = 0
         self.Position = 0
-        self.Finished = False
+        self.Finished = 0
 
 #Define constants
-DEBUG=False
+DEBUG=True
 DEFAULT_LAPS = 5
 
 #Event codes for xbox events
@@ -62,6 +62,7 @@ num_finished = 0
 start_time = datetime.now()
 players = []
 player_infos = []
+last_id = -1
 
 # Populate the players array with nonexsistant players
 for i in range(Players.MAX_PLAYERS):
@@ -84,9 +85,23 @@ def TimeEvent():
         timer = Timer(0.1, TimeEvent)
         timer.start()
 
-def ControllerEvent(player, event, data):
+# Receive controller input
+def ControllerEvent(player, event, data, packet_id):
     global race_info
     global players
+    global last_id
+    global player_infos
+    packet_id = int(packet_id)
+
+    # did packet arrive in order?
+    try:
+        if packet_id < last_id:
+            print "Discarding packet %d, last_received %d" % (packet_id, last_id)
+            return
+    except Exception as e:
+        print e
+
+    last_id = packet_id
 
     if (DEBUG and race_info.State != LAP_SELECT):
         try:
@@ -189,35 +204,44 @@ def ControllerEvent(player, event, data):
             players[player].turn = 0
         if data == 32767:
             players[player].turn = 1
+        print "Player turn", players[player].turn, player, player_infos
         player_infos[player].Turn == players[player].turn
+        print player_infos[player].Turn
+        print "updated"
     if event == BUT_A and data == 1 and players[player].powerup != None:
         # Player fired a powerup
         triggerPowerup(player)
 
+    print "F: %d R: %d" % (players[player].forward, players[player].reverse)
     if send:
         print "Beginning of controller event"
-        speed = players[player].forward - players[player].reverse
+        speed2 = players[player].forward - players[player].reverse
 
         #Deal with player effects
         Players.handleEffects(player)
+        players[player].speed_percent = Players.DEFAULT_SPEED_PERCENT
 
-        speed = int(speed * players[player].speed_percent)
+        speed2 = int(speed2 * players[player].speed_percent)
 
         #enforce speed boundaries
-        if (speed > Players.MAX_SPEED):
-            speed = Players.MAX_SPEED
+        if (speed2 > Players.MAX_SPEED):
+            speed2 = Players.MAX_SPEED
 
-        if (speed < Players.MIN_SPEED):
-            speed = Players.MIN_SPEED
+        if (speed2 < Players.MIN_SPEED):
+            speed2 = Players.MIN_SPEED
 
+        #update speed info for the GUI
         player_infos[player].Speed = speed * 100.0 / (MAX_SPEED * DEFAULT_SPEED_PERCENT)
         sender.sendUpdate(player_infos[player], "PlayerInfo" + str(player_infos[player].Number))
 
-        if (DEBUG):
-            print "Player: %d, Speed=%d, Turn=%d" % (player, speed, players[player].turn)
-        sender.sendAsync("CarEvent", player=str(int(player) + 1), speed=str(speed), turn=str(players[player].turn))
-        if (DEBUG):
-            print "Packet Sent"
+        try:
+            if (DEBUG):
+                print "Player: %d, Speed=%d, Turn=%d" % (player, speed2, players[player].turn)
+            sender.sendAsync("CarEvent", player=str(int(player_infos[player].Number)), speed=str(speed2), turn=str(players[player].turn))
+            if (DEBUG):
+                print "Packet Sent"
+        except Exception as e:
+            print e
 
 # Used to determine engine responsiveness
 def PingEvent():
@@ -225,10 +249,13 @@ def PingEvent():
     sender.sendUpdate(race_info, "RaceInfo")
 
 # Triggered when player passes through gate
-def GateEvent(player):
+def GateEvent(carNum):
+    print "Player", carNum
+    player = carNum
     global players
     global num_finished
     global race_info
+
 
     # Verify valid player number
     player = int(player)
@@ -250,7 +277,10 @@ def GateEvent(player):
     print "Player %d finished lap %d of %d in %f seconds" % (player + 1, len(players[player].laps) + 1, race_info.Laps, secs)
 
     # Add new lap time
-    players[player].laps.append(round(secs, 3))
+    try:
+        players[player].laps.append(round(secs, 3))
+    except Exception as e:
+        print e
 
     # If last lap
     if len(players[player].laps) == race_info.Laps:
@@ -259,7 +289,7 @@ def GateEvent(player):
         sender.sendAsync("PlayerFinish", player=str(player), time=str(sum(players[player].laps)))
         print "Player %d finished." % player
         num_finished += 1
-        player_infos[player].Finished = True
+        player_infos[player].Finished = 1
         if DEBUG:
             print "# finished: %d, # total: %d" %(num_finished, race_info.JoinedPlayers)
 
@@ -275,14 +305,20 @@ def GateEvent(player):
         sender.sendAsync("LapComplete", player=str(player), time=str(secs))
 
     # Update positions
-    positions = laps.getPositions(players)
-    player_infos[player].RelativeTime = (sum(players[player].laps) - sum(players[posititions[0]].laps)) * 1000
-    player_infos[player].CurrentLap += 1
+    try:
+        positions = laps.getPositions(players)
 
-    # Update each player
-    for p in range(Players.MAX_PLAYERS):
-        player_infos[p].Position = positions.index(p)
-        sender.sendUpdate(player_infos[p], "PlayerInfo" + str(player_infos[player].Number))
+        player_infos[player].RelativeTime = int(round((sum(players[player].laps) - sum(players[positions[0]].laps)) * 1000, 0))
+        player_infos[player].CurrentLap += 1
+
+        # Update each player
+        for p in range(Players.MAX_PLAYERS):
+            if player_infos[p] != None:
+                player_infos[p].Position = positions.index(p)
+                sender.sendUpdate(player_infos[p], "PlayerInfo" + str(player_infos[player].Number))
+                print "Sent player info"
+    except Exception as e:
+        print e
 
 
 #Validate the powerups schema
