@@ -6,7 +6,7 @@ import datetime
 MAX_PLAYERS = 2
 MAX_SPEED = 255
 MIN_SPEED = -255
-DEFAULT_SPEED_PERCENT = 0.75
+DEFAULT_SPEED_PERCENT = 1
 
 class PlayerState:
     def __init__(self):
