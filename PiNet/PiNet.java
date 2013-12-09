@@ -19,7 +19,6 @@ import java.util.logging.Logger;
  */
 public class PiNet {
 
-    MulticastSocket sock_send;
     MulticastSocket sock_receive;
     // Which port should we send to
     int port;
@@ -53,12 +52,6 @@ public class PiNet {
         sock_receive.joinGroup(InetAddress.getByName(group));
         sock_receive.setTimeToLive(ttl);
         sock_receive.setSoTimeout(1000);
-
-        // Configure the socket
-        sock_send = new MulticastSocket(new InetSocketAddress(InetAddress.getLocalHost().getHostName(), port));
-        sock_send.joinGroup(InetAddress.getByName(group));
-        sock_send.setTimeToLive(ttl);
-        sock_send.setSoTimeout(1000);
 
         Receiver receiver = new Receiver();
         receiver.start();
