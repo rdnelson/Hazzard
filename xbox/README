@@ -1,0 +1,9 @@
+To run the input controller, the xbox library must be built.
+
+Run:
+
+> make
+
+and then the input controller can be started by executing
+
+> ./input_controller.py
