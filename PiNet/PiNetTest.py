@@ -84,7 +84,7 @@ class TestReceiver(unittest.TestCase):
 	def test_parse_asyncdata_int(self):
 		testArg1 = 1
 		self.receiver.addCallback("test", self.callback)
-		self.assertRaises(xml.etree.ElementTree.ParseError, self.receiver.parse, ("<asyncData><test testArg=" + str(testArg) + "></test></asyncData>"))
+		self.assertRaises(xml.etree.ElementTree.ParseError, self.receiver.parse, ("<asyncData><test testArg1=" + str(testArg1) + "></test></asyncData>"))
 	
 	def test_init_simple(self):
 		testObj = PiNet.Receiver()
@@ -97,7 +97,7 @@ class TestReceiver(unittest.TestCase):
 	def test_receive(self):
 		self.receiver.addCallback("test", self.callback)
 		message = 'MessageReceived'
-		self.sock_send.sendto("<asyncData><test testArg='" + message + "'></test></asyncData>", ('224.0.0.1', 9001))
+		self.sock_send.sendto("<asyncData><test testArg1='" + message + "'></test></asyncData>", ('224.0.0.1', 9001))
 		time.sleep(0.5)
 		self.assertEquals(self.testText, 'MessageReceived')
 		

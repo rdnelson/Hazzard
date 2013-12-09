@@ -3,21 +3,30 @@ import socket
 import threading
 import thread
 
+#Data class is flexible, all data sent over PiNet must by of type Data
 class Data:
+	#"Batch" style constructor, allows kwarg variables ex: Data(x=5, y=2)
+	#creates a Data structure with variables x = 5, and y = 2.
 	def __init__(self, **kwds):
 		self.__dict__.update(kwds)
+	#Debugging handy
 	def __repr__(self):
 		return str(vars(self))
 
+#Global constants
 LOCAL_IP = socket.gethostbyname(socket.gethostname())
 MCAST_IP = '224.0.0.1'
 
+#Sender class. It is used to send data to a Receiver class
 class Sender:
+
+	#Local variables
 	sock_send = socket.socket()
 	defaultPort = 0
 
 	debug = False
 
+	#Constructor, creates socket, and sets default port
 	def __init__(self, port=9001):
 		self.defaultPort = port
 
@@ -32,29 +41,47 @@ class Sender:
 			print 'Init finished'
 			print ''
 
+	#Sets the default send port
 	def setDefaultPort(self, port):
 		if self.debug: print 'Setting default port to ', port
 		self.defaultPort = port
 
+	#Sends an asyncronous command with any number of arugments
 	def sendAsync(self, tag, port=None, **kwargs):
 		if port is None: port = self.defaultPort
 		if self.debug: print 'Sending asyncData ' + tag + ' to ', port
+		
+		#Create the XML document
 		root = ET.Element('asyncData')
 		node = ET.SubElement(root, tag)
+
+		#Add the attributes
 		for key, value in kwargs.iteritems():
 			node.set(key, value)
+
+		#Send the data
 		self.sock_send.sendto(ET.tostring(root), (MCAST_IP, port))
 		if self.debug: print 'AsyncData sent'
 
+	#Update the local version of the class "tag" on the receivers to
+	#match this version
 	def sendUpdate(self, data, name, port=None):
 		if port is None: port = self.defaultPort
 		if self.debug: print 'Sending syncData: ' + name + ' to ', port
+		
+		#Create the XML document
 		root = ET.Element('syncData')
 		dataNode = ET.SubElement(root, name)
+
+		#Call the recursive node adder
 		self.__addNodes(dataNode, vars(data))
+
+		#Send the data
 		self.sock_send.sendto(ET.tostring(root), (MCAST_IP, port))
 		if self.debug: print 'Data sent: ' + ET.tostring(root)
 
+	#A recusrive adding of a list of nodes. This allows for
+	#any arbitrary class to be serialized into XML
 	def __addNodes(self, root, items):
 		for name, value in items.iteritems():
 			newNode = ET.SubElement(root, name)
@@ -68,15 +95,20 @@ class Sender:
 					newNode.set('Type', 'Integer')
 				newNode.text = str(value)
 
+#Receiver class, receives messages sent from Sender
 class Receiver:
+	#Local variables
+
+	#Dictionary of tags matched to function pointers
 	callbacks = dict()
+
+	#Local Data
 	__data = Data()
 	sock_receive = socket.socket()
-
 	SERVER_ADDRESS = ()
-
 	debug = False
 
+	#Constructor, creates and binds a socket to port
 	def __init__(self, port=9001):
 		self.__setPort(port)
 
@@ -105,14 +137,16 @@ class Receiver:
 		self.thread.daemon = True
 		self.thread.start()
 
+	#Close the socket when finised
 	def close(self):
 		self.sock_receive.close()
 
+	#Set the port before binding
 	def __setPort(self, port):
 		if self.debug: print 'Setting receive port to ', port
 		self.SERVER_ADDRESS = ('', port)
 
-
+	#Thread for receiving data, blocks on data, and parses anything it gets
 	def receiver(self):
 		while True:
 			try:
@@ -122,22 +156,27 @@ class Receiver:
 			except:
 				pass
 
+	#Add a callback to "tag"
 	def addCallback(self, tag, callbackFunction):
 		self.callbacks.update({tag:callbackFunction})
 		if self.debug: print 'Added callback: ' + tag
 
+	#Remove callback referenced by "tag"
 	def removeCallback(self, tag):
 		if self.debug: 'Removing callback: ' + tag
 		return self.callbacks.pop(tag,False)
 
+	#Clear all callbacks
 	def clearCallbacks(self):
 		self.callbacks.clear()
 		if self.debug: 'Clearing callbacks'
 
+	#Retreive the data with tag "whatData" if it exists
 	def getData(self, whatData):
 		if self.debug: print 'Getting ' + whatData + ' syncData'
 		return getattr(self.__data, whatData)
 
+	#Hibernate till SIGINT
 	def hibernate(self):
 		try:
 			while True:
@@ -145,6 +184,7 @@ class Receiver:
 		except(KeyboardInterrupt):
 			print "Waking from Hibernation"
 
+	#Parse received XML
 	def parse(self, text):
 		if self.debug: print 'Parsing'
 		root = ET.XML(text)
@@ -153,6 +193,7 @@ class Receiver:
 			for node in list(root):
 				if self.debug: print 'Parsing syncData type: ' + node.tag
 				nodeClass = Data()
+				#Recursivly add the items under the root node
 				for dataNode in list(node):
 					self.__addItem(nodeClass, dataNode)
 				setattr(self.__data, node.tag, nodeClass)
@@ -165,9 +206,12 @@ class Receiver:
 				if self.callbacks.has_key(tag):
 					if self.debug: print 'Calling callback for packet: ' + node.tag
 					if self.debug: print node.items()
+
+					#Call the callback with the arguments packed as kwargs
 					self.callbacks.get(tag)(**dict(node.items()))
 				elif self.debug: print 'Callback not found for ' + node.tag
 
+	#Recursive turning nodes into classes. Adds the node and any children to the root
 	def __addItem(self, root, node):
 		if list(node) == []:
 			if node.get('Type') == 'Integer':
