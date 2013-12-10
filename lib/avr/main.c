@@ -32,7 +32,7 @@ uint8_t buffer[32];
 #define CMD_DRIVE 0x48
 #define CMD_SETPULSE 0x49
 
-
+//define for a 100Hz tick frequency
 #define FREQ_100HZ 39
 
 void platform_init()
@@ -105,7 +105,10 @@ void set_ce(pinmode mode)
         PORTD &= ~(_BV(PORTD4));
 }
 
-
+/**
+*Main function for the firmware. Gets called after reset.
+*@return an int value, but nonsensical in an embedded context.
+*/
 int main(void)
 {
     uint8_t a;
@@ -115,24 +118,33 @@ int main(void)
 
 
 
-
+    //initialize the nRF radio module
     nrf_init();
 
-
+    //configure the nRF radio module to channel 12, with default packet size 4
     nrf_config(12,4);
+    //set the transmitter address (address to reply to when ACKing)
     nrf_set_address(1, tx_address);
+
+    //power the radio in receiver mode
     nrf_power_radio(MODE_RX);
 
+    //set the receiver address
     nrf_set_address(0, rx_address);
+
+
 #ifdef DEBUG_MODE
+    //init UART only in debug
     uart_init(115200);
 
+
+    //read and print out RX and TX addresses
     nrf_read_register(RX_ADDR_P1, buffer,5);
     uart_tx_string("RX_ADDR_P1:");
     for (i=0; i<5; i++)
         uart_tx_byte_hex(buffer[i]);
-
     uart_tx_string("\n");
+
     nrf_read_register(RX_ADDR_P0, buffer,5);
     uart_tx_string("RX_ADDR_P0:");
     for (i=0; i<5; i++)
@@ -140,19 +152,17 @@ int main(void)
     uart_tx_string("\n");
 
 
-
+    //print registers in debug mode.
     PRINT_REG(RF_CH);
     PRINT_REG(STATUS);
     PRINT_REG(EN_AA);
     PRINT_REG(FIFO_STATUS);
 #endif
+    //enable interrupts
     sei();
 
 
-
-
-
-    while (1);
+    while (1); //go into busy wait loop
 }
 
 /*Timer 2 compare interrupt
