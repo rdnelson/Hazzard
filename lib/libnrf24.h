@@ -1,5 +1,23 @@
 #ifndef _LIBNRF24_H
 #define _LIBNRF24_H
+/**
+*LibNRF24: portable library for interfacing with the nRF24L01+ series of modules
+*@author Hasith Vidanamadura
+*This library simplifies the task of configuring and transmitting data over an nRF link.
+*It is designed to be portable and interfaces with six external functions for setting up the necessary IO,
+*setting pins for SPI and radio functions, and for the SPI interface. The code is portable to any architecture  
+*supported by GCC.
+*Usage:
+*The function calls should follow an order:
+* - nrf_init(), followed by nrf_config(channel, payload-size);
+* - nrf_set_address() for both TX and RX modes
+* - nrf_set_address_suffix if using devices on same "subnet"
+* - nrf_send()
+*Addresses:
+*The currently accepted convention in a five-byte address is as follows
+* <4 byte prefix><single byte suffix> where the prefix determines the subnet, and the suffix the hostname.
+*/
+
 #include <stdint.h>
 #include <stdlib.h>
 /* Memory Map */
@@ -116,13 +134,22 @@
 
 #define NRF_CHANNEL 3
 
-
+/**
+*Typedef for NRF transmitter mode
+*
+*/
 typedef enum NRF_MODE{
 	MODE_RX,
 	MODE_TX,
 } nrf_mode_t;
 
+/**
+*IO mode for functions (read|write)
+**/
 typedef enum {R =0, W=1} io_mode_t;
+/**
+*Typedef for pins
+**/
 typedef enum {LOW =0, HIGH=1} pinmode;
 
 void nrf_init();
@@ -147,12 +174,61 @@ void nrf_power_radio(nrf_mode_t tx);
 void nrf_receive(uint8_t* pStart, uint8_t len);
 uint8_t nrf_is_busy();
 
+
+/**
+*Platform provided function to set the CE pin.
+*The CE pin is a pin to enable the radio, and must follow a certain sequence.
+*The platform must support setting or unsetting a GPIO pin when this function is called.
+*@param mode mode to set the pin to, HIGH or LOW.
+*@return None.
+*/
 extern void set_ce(pinmode mode);
+/**
+*Platform provided function to set the SPI Chip Select pin.
+*The SS/CSN pin is a pin to signal a SPI data transfer and the end, and is used by the nRF hardware to determine a transaction.
+*The platform must support setting or unsetting a GPIO pin when this function is called.
+*@param mode mode to set the pin to, HIGH or LOW.
+*@return None.
+*/
 extern void set_csn(pinmode mode);
 
+
+/**
+*Platform provided function to synchrnously exchange data with an SPI slave.
+*Transmit_sync() transfers len bytes to the nRF radio, while receiving len bytes back.
+*The platform must NOT toggle the CS pin, set_csn() will be called appropriately.
+*@param pIn pointer to byte array to transmit
+*@param pOut pointer to byte buffer to receive from. Must be len bytes long.
+*@param len Size of the transaction in bytes
+*@return None
+*/
 extern void transmit_sync(uint8_t* pStart, uint8_t* pIn, uint8_t len);
+
+/**
+*Platform provided function to write data to a SPI slave and ignore received.
+*Transfer_sync() transfers len bytes to the nRF radio and discards the received data from the slave.
+*The platform must NOT toggle the CS pin, set_csn() will be called appropriately.
+*@param pStart pointer to byte array to transmit
+*@param len Size of the transaction in bytes
+*@return None
+*/
 extern void transfer_sync(uint8_t* pStart, uint8_t len);
+
+/**
+*Platform provided function to write  a single data byte to a SPI slave and receive a byte back.
+*fast_shift() transfers 1 byte to the nRF radio and returns the received data from the slave.
+*The platform must NOT toggle the CS pin, set_csn() will be called appropriately.
+*@param value value to send to SPI slave.
+*@return The response from the SPI slave.
+*/
 extern uint8_t fast_shift(uint8_t value);
+
+/**
+*Platform provided function to initialize the GPIO and SPI subsystems required for the nRF to function.
+*Here, the platform must set up SPI clock speeds for the slave, Mode 0 communication, and the GPIOs for SPI CS and CE pins.
+*libNRF will call this function as part of its setup routine
+*@return None
+*/
 extern void platform_init();
 
 #endif

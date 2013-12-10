@@ -11,7 +11,7 @@
 #include "stdio.h"
 #include  "string.h"
 uint8_t data_array[32];
-uint8_t rx_address[5] = {0xDE,0xAD,0xBE,0xEF,0xD7};
+uint8_t rx_address[5] = {0x0A,0xEF,0xBE,0xAD,0xDE};
 uint8_t tx_address[5] = {0xE7,0xE7,0xC3,0xE2,0xE7};
 #define RF_CHANNEL 12
 #define PAYLOAD_SIZE 4
@@ -111,11 +111,11 @@ int main(int argc, char** argv){
 	}
 	
 	}
-
+	//send a single longer packet
 	memcpy(data_array, "this is longer!",15);
 	nrf_send(data_array,15);
 
-
+	//print lost packet count
 	printf("Done sending! %d lost packets\n", plos_count);
 }
 
